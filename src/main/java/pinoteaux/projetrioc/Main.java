@@ -5,13 +5,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import pinoteaux.projetrioc.gamepart.Chrono;
+import pinoteaux.projetrioc.gamepart.Controller;
+import pinoteaux.projetrioc.gamepart.Simon;
 
 import java.io.IOException;
 
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("menu.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("menu/menu.fxml"));
         Parent root = fxmlLoader.load();
 
 
@@ -27,7 +30,7 @@ public class Main extends Application {
 
     // Méthode pour lancer le jeu Simon
     public void startSimonGame(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("simon.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("gamepart/simon.fxml"));
         Parent root = fxmlLoader.load();
 
         // Obtenez le contrôleur de Simon et configurez-le

@@ -7,4 +7,8 @@ module pinoteaux.projetrioc {
 
     opens pinoteaux.projetrioc to javafx.fxml;
     exports pinoteaux.projetrioc;
+    exports pinoteaux.projetrioc.gamepart;
+    opens pinoteaux.projetrioc.gamepart to javafx.fxml;
+    exports pinoteaux.projetrioc.menu;
+    opens pinoteaux.projetrioc.menu to javafx.fxml;
 }

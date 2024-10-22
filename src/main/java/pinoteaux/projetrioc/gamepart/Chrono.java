@@ -1,8 +1,9 @@
-package pinoteaux.projetrioc;
+package pinoteaux.projetrioc.gamepart;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
+
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 

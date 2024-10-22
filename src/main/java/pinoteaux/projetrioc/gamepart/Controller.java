@@ -1,4 +1,4 @@
-package pinoteaux.projetrioc;
+package pinoteaux.projetrioc.gamepart;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -13,6 +13,9 @@ import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import pinoteaux.projetrioc.menu.ChoixServer;
+import pinoteaux.projetrioc.menu.Classement;
+import pinoteaux.projetrioc.Main;
 
 import java.io.IOException;
 

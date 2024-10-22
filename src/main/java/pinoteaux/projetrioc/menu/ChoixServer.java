@@ -1,4 +1,4 @@
-package pinoteaux.projetrioc;
+package pinoteaux.projetrioc.menu;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

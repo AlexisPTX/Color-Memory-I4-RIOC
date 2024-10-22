@@ -1,4 +1,4 @@
-package pinoteaux.projetrioc;
+package pinoteaux.projetrioc.gamepart;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;

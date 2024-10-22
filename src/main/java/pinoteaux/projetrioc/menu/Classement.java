@@ -1,4 +1,4 @@
-package pinoteaux.projetrioc;
+package pinoteaux.projetrioc.menu;
 
 import javafx.stage.Stage;
 
