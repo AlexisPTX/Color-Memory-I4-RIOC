@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pinoteaux.projetrioc.menu.ChoixServer">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pinoteaux.projetrioc.menu.ControllerChoixServer">
    <children>
       <Text layoutX="211.0" layoutY="132.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Choix tournois" textAlignment="CENTER">
          <font>
@@ -15,27 +15,27 @@
       </Text>
       <Group layoutX="425.0" layoutY="300.0">
          <children>
-            <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="150.0" text="Serveur 1" textAlignment="CENTER">
+            <Button fx:id="buttonServer1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#actionButtonServer1" prefHeight="50.0" prefWidth="150.0" text="Serveur 1" textAlignment="CENTER">
                <font>
                   <Font size="25.0" />
                </font>
             </Button>
-            <Button layoutY="75.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="150.0" text="Serveur 2" textAlignment="CENTER">
+            <Button fx:id="buttonServer2" layoutY="75.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#actionButtonServer1" prefHeight="50.0" prefWidth="150.0" text="Serveur 2" textAlignment="CENTER">
                <font>
                   <Font size="25.0" />
                </font>
             </Button>
-            <Button layoutY="150.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="150.0" text="Serveur 3" textAlignment="CENTER">
+            <Button fx:id="buttonServer3" layoutY="150.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#actionButtonServer3" prefHeight="50.0" prefWidth="150.0" text="Serveur 3" textAlignment="CENTER">
                <font>
                   <Font size="25.0" />
                </font>
             </Button>
-            <Button layoutY="225.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="150.0" text="Serveur 4" textAlignment="CENTER">
+            <Button fx:id="buttonServer4" layoutY="225.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#actionButtonServer4" prefHeight="50.0" prefWidth="150.0" text="Serveur 4" textAlignment="CENTER">
                <font>
                   <Font size="25.0" />
                </font>
             </Button>
-            <Button layoutY="300.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="150.0" text="Serveur 3" textAlignment="CENTER">
+            <Button fx:id="buttonServer5" layoutY="300.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#actionButtonServer5" prefHeight="50.0" prefWidth="150.0" text="Serveur 3" textAlignment="CENTER">
                <font>
                   <Font size="25.0" />
                </font>

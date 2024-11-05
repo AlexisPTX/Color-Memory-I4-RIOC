@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Random;
 
 public class Simon {
-    private final Controller controller;
+    private final ControllerSimon controller;
     private Chrono chrono;
 
     private int sequenceActual = 1; // Pas besoin d'être statique
     private int currentPlayerIndex = 0; // L'index actuel dans la séquence du joueur
     private final List<Integer> randomIntegers = new ArrayList<>();
 
-    public Simon(Controller controller, Chrono chrono) {
+    public Simon(ControllerSimon controller, Chrono chrono) {
         this.controller = controller;
         this.chrono = chrono;
         this.chrono.startChrono();

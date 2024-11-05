@@ -2,24 +2,15 @@ package pinoteaux.projetrioc.gamepart;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import javafx.util.Duration;
-import pinoteaux.projetrioc.menu.ChoixServer;
-import pinoteaux.projetrioc.menu.Classement;
-import pinoteaux.projetrioc.Main;
 
-import java.io.IOException;
-
-public class Controller {
+public class ControllerSimon {
 
     @FXML
     private SVGPath red;
@@ -39,14 +30,7 @@ public class Controller {
     private Group finGroup;
     @FXML
     private Group jeuGroup;
-    @FXML
-    private Button soloButton;
-    @FXML
-    private Button tournoisButton;
-    @FXML
-    private Button classementButton;
     private Simon simon;
-    private Main mainApp;
 
     public void setSimon(Simon simon) {
         this.simon = simon;
@@ -132,18 +116,6 @@ public class Controller {
         timeline.play();
     }
 
-    public void actionSoloButton(ActionEvent e) throws IOException {
-        if (mainApp != null) {
-            mainApp.startSimonGame((Stage) ((Node) e.getSource()).getScene().getWindow());
-        }
-    }
-    public void actionTournoisButton(ActionEvent e) throws IOException {
-        ChoixServer.main((Stage)((Node) e.getSource()).getScene().getWindow());
-    }
-    public void actionClassementButton(ActionEvent e) throws IOException {
-        Classement.main((Stage)((Node) e.getSource()).getScene().getWindow());
-    }
-
     public void blinkShape(int i, String s) {
         if(s.equals("DARK")) {
             switch (i) {
@@ -160,10 +132,6 @@ public class Controller {
                 case 4 -> red.setFill(Color.RED);
             }
         }
-    }
-
-    public void setMainApp(Main mainApp) {
-        this.mainApp = mainApp;
     }
 
     public void disableShape() {

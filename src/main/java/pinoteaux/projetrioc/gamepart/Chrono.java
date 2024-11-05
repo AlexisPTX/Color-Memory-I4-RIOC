@@ -12,10 +12,10 @@ public class Chrono{
     private int timeInSeconds;
     private final DateTimeFormatter timeFormatter;
     private Timeline timeline;
-    private final Controller controller;
+    private final ControllerSimon controller;
     private Simon simon;
 
-    public Chrono(int minutes, Controller controller) {
+    public Chrono(int minutes, ControllerSimon controller) {
         this.controller = controller;
         this.timeInSeconds = minutes * 5; // Convertir les minutes en secondes
         this.timeFormatter = DateTimeFormatter.ofPattern("mm:ss");

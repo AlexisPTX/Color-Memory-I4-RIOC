@@ -6,8 +6,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import pinoteaux.projetrioc.gamepart.Chrono;
-import pinoteaux.projetrioc.gamepart.Controller;
+import pinoteaux.projetrioc.gamepart.ControllerSimon;
 import pinoteaux.projetrioc.gamepart.Simon;
+import pinoteaux.projetrioc.menu.ControllerMenu;
 
 import java.io.IOException;
 
@@ -17,8 +18,7 @@ public class Main extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("menu/menu.fxml"));
         Parent root = fxmlLoader.load();
 
-
-        Controller controller = fxmlLoader.getController();
+        ControllerMenu controller = fxmlLoader.getController();
         controller.setMainApp(this);
 
         Scene scene = new Scene(root, 1000, 800);
@@ -34,7 +34,7 @@ public class Main extends Application {
         Parent root = fxmlLoader.load();
 
         // Obtenez le contrôleur de Simon et configurez-le
-        Controller controller = fxmlLoader.getController();
+        ControllerSimon controller = fxmlLoader.getController();
         Chrono chrono = new Chrono(1,controller);
         Simon simon = new Simon(controller,chrono);
         controller.setSimon(simon);
@@ -49,6 +49,18 @@ public class Main extends Application {
 
         // Démarrez le jeu Simon
         simon.startGame();
+    }
+    public void startClassement(Stage stage) throws IOException {
+    }
+    public void startChoixServer(Stage stage) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("menu/choixServer.fxml"));
+        Parent root = fxmlLoader.load();
+
+        Scene scene = new Scene(root, 1000, 800);
+        stage.setTitle("Color Memory");
+        stage.setResizable(false);
+        stage.setScene(scene);
+        stage.show();
     }
 
     public static void main(String[] args) {
