@@ -2,11 +2,12 @@ package pinoteaux.projetrioc.server;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Server {
     private static final int maxUsers = 10;
-    private static int currentUsers = 0;
+
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket1 = new ServerSocket(1111);
         ServerSocket serverSocket2 = new ServerSocket(2222);
@@ -23,19 +24,20 @@ public class Server {
     }
 
     private static void handleClient(ServerSocket serverSocket, int serverNumber) {
+        AtomicInteger currentUsers = new AtomicInteger();
         try {
             System.out.println("Server " + serverNumber + " is running on port " + serverSocket.getLocalPort());
 
             while (true) {
-                if (currentUsers < maxUsers) {
+                if (currentUsers.get() < maxUsers) {
                     Socket socket = serverSocket.accept();
                     System.out.println("Client connected on server " + serverNumber);
-                    currentUsers++;
+                    currentUsers.getAndIncrement();
                     new Thread(() -> {
                         try {
                             handleClientConnection(socket, serverNumber);
                         } finally {
-                            currentUsers--;
+                            currentUsers.getAndDecrement();
                             System.out.println("Client disconnected from server " + serverNumber);
                         }
                     }).start();

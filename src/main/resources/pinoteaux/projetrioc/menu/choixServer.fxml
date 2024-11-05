@@ -20,7 +20,7 @@
                   <Font size="25.0" />
                </font>
             </Button>
-            <Button fx:id="buttonServer2" layoutY="75.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#actionButtonServer1" prefHeight="50.0" prefWidth="150.0" text="Serveur 2" textAlignment="CENTER">
+            <Button fx:id="buttonServer2" layoutY="75.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#actionButtonServer2" prefHeight="50.0" prefWidth="150.0" text="Serveur 2" textAlignment="CENTER">
                <font>
                   <Font size="25.0" />
                </font>
@@ -35,7 +35,7 @@
                   <Font size="25.0" />
                </font>
             </Button>
-            <Button fx:id="buttonServer5" layoutY="300.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#actionButtonServer5" prefHeight="50.0" prefWidth="150.0" text="Serveur 3" textAlignment="CENTER">
+            <Button fx:id="buttonServer5" layoutY="300.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#actionButtonServer5" prefHeight="50.0" prefWidth="150.0" text="Serveur 5" textAlignment="CENTER">
                <font>
                   <Font size="25.0" />
                </font>
