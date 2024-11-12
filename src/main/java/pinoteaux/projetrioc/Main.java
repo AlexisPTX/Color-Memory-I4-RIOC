@@ -2,6 +2,7 @@ package pinoteaux.projetrioc;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -10,7 +11,10 @@ import pinoteaux.projetrioc.gamepart.ControllerSimon;
 import pinoteaux.projetrioc.gamepart.Simon;
 import pinoteaux.projetrioc.menu.ControllerMenu;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
 
 public class Main extends Application {
     @Override
@@ -61,6 +65,14 @@ public class Main extends Application {
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
+    }
+    public void attenteDebutTournoi(Stage stage, Socket socket) throws IOException {
+        BufferedReader bf = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        while(true){
+            if(bf.readLine().equals("START")){
+                this.startSimonGame(stage);
+            }
+        }
     }
 
     public static void main(String[] args) {

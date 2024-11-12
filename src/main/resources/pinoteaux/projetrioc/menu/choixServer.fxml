@@ -13,7 +13,7 @@
             <Font size="96.0" />
          </font>
       </Text>
-      <Group layoutX="425.0" layoutY="300.0">
+      <Group fx:id="buttonGroup" layoutX="425.0" layoutY="300.0">
          <children>
             <Button fx:id="buttonServer1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#actionButtonServer1" prefHeight="50.0" prefWidth="150.0" text="Serveur 1" textAlignment="CENTER">
                <font>

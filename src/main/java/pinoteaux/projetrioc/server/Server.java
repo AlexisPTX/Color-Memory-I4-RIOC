@@ -29,18 +29,25 @@ public class Server {
             System.out.println("Server " + serverNumber + " is running on port " + serverSocket.getLocalPort());
 
             while (true) {
+                Socket socket = new Socket();
                 if (currentUsers.get() < maxUsers) {
-                    Socket socket = serverSocket.accept();
+                    socket = serverSocket.accept();
                     System.out.println("Client connected on server " + serverNumber);
                     currentUsers.getAndIncrement();
+                    Socket finalSocket = socket;
                     new Thread(() -> {
                         try {
-                            handleClientConnection(socket, serverNumber);
+                            handleClientConnection(finalSocket, serverNumber);
                         } finally {
                             currentUsers.getAndDecrement();
                             System.out.println("Client disconnected from server " + serverNumber);
                         }
                     }).start();
+                }
+                if(currentUsers.get() == maxUsers && socket.isConnected()){
+                    PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
+                    pw.println("START");
+                    System.out.println("Game started on server " + serverNumber);
                 }
             }
         } catch (IOException e) {
