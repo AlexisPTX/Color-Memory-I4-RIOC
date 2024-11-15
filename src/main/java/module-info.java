@@ -4,6 +4,7 @@ module pinoteaux.projetrioc {
 
     requires org.controlsfx.controls;
     requires com.almasb.fxgl.all;
+    requires com.google.gson;
 
     opens pinoteaux.projetrioc to javafx.fxml;
     exports pinoteaux.projetrioc;

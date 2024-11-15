@@ -1,5 +1,7 @@
 package pinoteaux.projetrioc.gamepart;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
@@ -8,40 +10,49 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class Simon {
     private final ControllerSimon controller;
+    private Socket socket;
     private Chrono chrono;
 
-    private int sequenceActual = 1; // Pas besoin d'être statique
-    private int currentPlayerIndex = 0; // L'index actuel dans la séquence du joueur
+    private int sequenceActual = 1;
+    private int currentPlayerIndex = 0;
     private final List<Integer> randomIntegers = new ArrayList<>();
 
-    public Simon(ControllerSimon controller, Chrono chrono) {
+    public Simon(ControllerSimon controller, Socket socket, Chrono chrono, String mode) {
         this.controller = controller;
+        this.socket = socket;
         this.chrono = chrono;
         this.chrono.startChrono();
-        initList(); // Initialiser la liste lors de la création de Simon
-        startGame(); // Lancer le jeu immédiatement après
+        initList("SOLO");
+        startGame();
     }
 
-    // Méthode pour initialiser la liste de séquences aléatoires
-    private void initList() {
-        for (int i = 0; i < 100; i++) {
-            randomIntegers.add(new Random().nextInt(1, 5));
+    private void initList(String mode) {
+        if(mode.equals("SOLO")) {
+            for (int i = 0; i < 100; i++) {
+                randomIntegers.add(new Random().nextInt(1, 5));
+            }
+        }else if(mode.equals("MULTI"))  {
+            try{
+                BufferedReader bf = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+                randomIntegers.set(0, Integer.parseInt(bf.readLine()));
+            }
+            catch(IOException e){e.printStackTrace();}
         }
-        // Debug : afficher la séquence générée
-        /*for (Integer number : randomIntegers) {
-            System.out.println(number);
-        }*/
     }
 
     // Méthode pour afficher la séquence actuelle
-    private void displaySequence() {
+    public void displaySequence() {
         this.controller.updateSequence(sequenceActual);
         this.controller.disableShape();
         Timeline timeline = new Timeline();
@@ -53,9 +64,6 @@ public class Simon {
                 pause.play();
             }
 
-            // Le temps d'attente entre chaque clignotement
-
-            // Clignotement de la couleur
             KeyFrame brightFrame = new KeyFrame(Duration.seconds(index), event -> {
                 this.controller.blinkShape(randomIntegers.get(index), "BRIGHT");
             });
@@ -72,42 +80,56 @@ public class Simon {
             });
             timeline.play();
         });
-
-
     }
 
-
-    // Méthode appelée quand le joueur clique sur une couleur
     public void checkAnswer(int userAnswer) {
-        if (randomIntegers.get(currentPlayerIndex) == userAnswer) {
-            currentPlayerIndex++; // Si la réponse est correcte, on passe à l'index suivant
+        if(this.socket == null) {
+            if (randomIntegers.get(currentPlayerIndex) == userAnswer) {
+                currentPlayerIndex++;
 
-            if (currentPlayerIndex == sequenceActual) {
-                // Si la séquence est terminée, on passe à la séquence suivante
-                sequenceActual++;
+                if (currentPlayerIndex == sequenceActual) {
+                    sequenceActual++;
+                    currentPlayerIndex = 0;
+                    this.controller.updateMessageSequence("SUIVANT");
+                    javafx.application.Platform.runLater(this::displaySequence);
+                }
+
+            } else {
+                this.controller.updateMessageSequence("RESET");
                 currentPlayerIndex = 0;
-                this.controller.updateMessageSequence("SUIVANT");
-                displaySequence(); // Afficher la nouvelle séquence
+                javafx.application.Platform.runLater(this::displaySequence);
             }
+        }else{
+            try {
+                BufferedReader bf = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+                PrintWriter pw = new PrintWriter(this.socket.getOutputStream(), true);
 
-        } else {
-            // Si la réponse est incorrecte, on réinitialise le jeu
-            this.controller.updateMessageSequence("RESET");
-            currentPlayerIndex = 0; // Appeler une méthode pour réinitialiser le jeu
-            displaySequence();
+                Gson gson = new Gson();
+                JsonObject json = new JsonObject();
+                json.addProperty("userAnswer", userAnswer);
+                json.addProperty("sequenceActual", sequenceActual);
+                json.addProperty("currentPlayerIndex", currentPlayerIndex);
+
+                pw.println(gson.toJson(json));
+
+                String responseJson;
+                while((responseJson = bf.readLine()) != null){
+                    JsonObject response = gson.fromJson(responseJson, JsonObject.class);
+                    currentPlayerIndex = response.get("currentPlayerIndex").getAsInt();
+                    sequenceActual = response.get("sequenceActual").getAsInt();
+                    javafx.application.Platform.runLater(this::displaySequence);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-    }
-
-    // Méthode pour réinitialiser le jeu
-    private void resetGame() {
-        sequenceActual = 1;
-        currentPlayerIndex = 0;
-        displaySequence(); // Réafficher la première séquence
     }
 
     // Méthode pour démarrer le jeu
     public void startGame() {
-        resetGame(); // Lancer le jeu en réinitialisant
+        sequenceActual = 1;
+        currentPlayerIndex = 0;
+        javafx.application.Platform.runLater(this::displaySequence);
     }
 
     // Méthode main pour démarrer l'application

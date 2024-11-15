@@ -36,81 +36,42 @@ public class ControllerSimon {
         this.simon = simon;
         finGroup.setVisible(false);
     }
+
     public void stopSimon(){
         jeuGroup.setMouseTransparent(true);
         finGroup.setVisible(true);
     }
 
     public void actionRed(MouseEvent e) {
+        handleAction(e, 4);
+    }
+
+    public void actionYellow(MouseEvent e) {
+        handleAction(e, 3);
+    }
+
+    public void actionBlue(MouseEvent e) {
+        handleAction(e, 2);
+    }
+
+    public void actionGreen(MouseEvent e) {
+        handleAction(e, 1);
+    }
+
+    private void handleAction(MouseEvent e, int colorIndex) {
         disableShape();
         Timeline timeline = new Timeline();
         KeyFrame brightFrame = new KeyFrame(Duration.seconds(0.1), event -> {
-            this.blinkShape(4, "BRIGHT");
+            this.blinkShape(colorIndex, "BRIGHT");
         });
         KeyFrame darkFrame = new KeyFrame(Duration.seconds(0.5), event -> {
-            this.blinkShape(4, "DARK");
+            this.blinkShape(colorIndex, "DARK");
         });
         KeyFrame delayFrame = new KeyFrame(Duration.seconds(0.3)); // Délai de 0.5 seconde
 
         timeline.getKeyFrames().addAll(brightFrame, darkFrame, delayFrame);
         timeline.setOnFinished(event -> {
-            simon.checkAnswer(4); // Appeler checkAnswer après la fin de la timeline
-            enableShape();
-        });
-        timeline.play();
-
-
-    }
-    public void actionYellow(MouseEvent e) {
-        disableShape();
-        Timeline timeline = new Timeline();
-        KeyFrame brightFrame = new KeyFrame(Duration.seconds(0), event -> {
-            this.blinkShape(3, "BRIGHT");
-        });
-        KeyFrame darkFrame = new KeyFrame(Duration.seconds(0.3), event -> {
-            this.blinkShape(3, "DARK");
-        });
-        KeyFrame delayFrame = new KeyFrame(Duration.seconds(0.5)); // Délai de 0.5 seconde
-
-        timeline.getKeyFrames().addAll(brightFrame, darkFrame, delayFrame);
-        timeline.setOnFinished(event -> {
-            simon.checkAnswer(3); // Appeler checkAnswer après la fin de la timeline
-            enableShape();
-        });
-        timeline.play();
-    }
-    public void actionBlue(MouseEvent e) {
-        disableShape();
-        Timeline timeline = new Timeline();
-        KeyFrame brightFrame = new KeyFrame(Duration.seconds(0), event -> {
-            this.blinkShape(2, "BRIGHT");
-        });
-        KeyFrame darkFrame = new KeyFrame(Duration.seconds(0.3), event -> {
-            this.blinkShape(2, "DARK");
-        });
-        KeyFrame delayFrame = new KeyFrame(Duration.seconds(0.5)); // Délai de 0.5 seconde
-
-        timeline.getKeyFrames().addAll(brightFrame, darkFrame, delayFrame);
-        timeline.setOnFinished(event -> {
-            simon.checkAnswer(2); // Appeler checkAnswer après la fin de la timeline
-            enableShape();
-        });
-        timeline.play();
-    }
-    public void actionGreen(MouseEvent e) {
-        disableShape();
-        Timeline timeline = new Timeline();
-        KeyFrame brightFrame = new KeyFrame(Duration.seconds(0), event -> {
-            this.blinkShape(1, "BRIGHT");
-        });
-        KeyFrame darkFrame = new KeyFrame(Duration.seconds(0.3), event -> {
-            this.blinkShape(1, "DARK");
-        });
-        KeyFrame delayFrame = new KeyFrame(Duration.seconds(0.5)); // Délai de 0.5 seconde
-
-        timeline.getKeyFrames().addAll(brightFrame, darkFrame, delayFrame);
-        timeline.setOnFinished(event -> {
-            simon.checkAnswer(1); // Appeler checkAnswer après la fin de la timeline
+            simon.checkAnswer(colorIndex); // Appeler checkAnswer après la fin de la timeline
             enableShape();
         });
         timeline.play();
@@ -124,7 +85,7 @@ public class ControllerSimon {
                 case 3 -> yellow.setFill(Color.DARKGOLDENROD);
                 case 4 -> red.setFill(Color.DARKRED);
             }
-        }else if(s.equals("BRIGHT")) {
+        } else if(s.equals("BRIGHT")) {
             switch (i) {
                 case 1 -> green.setFill(Color.LIME);
                 case 2 -> blue.setFill(Color.BLUE);
@@ -155,6 +116,7 @@ public class ControllerSimon {
     public void updateSequence(int sequence) {
         this.sequence.setText(String.valueOf(sequence));
     }
+
     public void updateMessageSequence(String message) {
         Timeline timeline = new Timeline();
         KeyFrame writeFrame = null;
@@ -168,8 +130,7 @@ public class ControllerSimon {
                 this.messageSequence.setText("");
             });
 
-        }
-        else if (message.equals("RESET")) {
+        } else if (message.equals("RESET")) {
             writeFrame = new KeyFrame(Duration.seconds(0), event -> {
                 this.messageSequence.setFill(Color.RED);
                 this.messageSequence.setText("Raté ! Recommencez");

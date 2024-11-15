@@ -20,20 +20,22 @@ public class ControllerMenu {
     private Button classementButton;
     private Main mainApp;
 
-    public void actionSoloButton(ActionEvent e) throws IOException {
+    public void actionSoloButton(ActionEvent e) {
         if (mainApp != null) {
-            mainApp.startSimonGame((Stage) ((Node) e.getSource()).getScene().getWindow());
+            mainApp.startSimonGame((Stage) ((Node) e.getSource()).getScene().getWindow(), null, "SOLO");
         }
     }
-    public void actionTournoisButton(ActionEvent e) throws IOException {
+    public void actionTournoisButton(ActionEvent e) {
         if (mainApp != null) {
             mainApp.startChoixServer((Stage) ((Node) e.getSource()).getScene().getWindow());
         }
+
     }
-    public void actionClassementButton(ActionEvent e) throws IOException {
+    public void actionClassementButton(ActionEvent e) {
         if (mainApp != null) {
             mainApp.startClassement((Stage) ((Node) e.getSource()).getScene().getWindow());
         }
+
     }
     public void setMainApp(Main mainApp) {
         this.mainApp = mainApp;

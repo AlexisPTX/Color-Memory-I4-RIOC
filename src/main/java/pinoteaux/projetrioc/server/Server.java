@@ -2,74 +2,55 @@ package pinoteaux.projetrioc.server;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Server {
-    private static final int maxUsers = 10;
+    private static final int MAX_USERS = 3;
+    private static final int[] PORTS = {1111, 2222, 3333, 4444, 5555};
+    private static final List<Integer> randomIntegers = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket1 = new ServerSocket(1111);
-        ServerSocket serverSocket2 = new ServerSocket(2222);
-        ServerSocket serverSocket3 = new ServerSocket(3333);
-        ServerSocket serverSocket4 = new ServerSocket(4444);
-        ServerSocket serverSocket5 = new ServerSocket(5555);
-
-        // Crée des threads pour gérer chaque serveur de manière indépendante
-        new Thread(() -> handleClient(serverSocket1, 1)).start();
-        new Thread(() -> handleClient(serverSocket2, 2)).start();
-        new Thread(() -> handleClient(serverSocket3, 3)).start();
-        new Thread(() -> handleClient(serverSocket4, 4)).start();
-        new Thread(() -> handleClient(serverSocket5, 5)).start();
+        for (int i = 0; i < PORTS.length; i++) {
+            int serverNumber = i + 1;
+            ServerSocket serverSocket = new ServerSocket(PORTS[i]);
+            new Thread(() -> handleClient(serverSocket, serverNumber)).start();
+        }
+        for (int i = 0; i < 100; i++) {
+            randomIntegers.add(new Random().nextInt(1, 5));
+        }
     }
 
     private static void handleClient(ServerSocket serverSocket, int serverNumber) {
         AtomicInteger currentUsers = new AtomicInteger();
+        List<Socket> connectedClients = new ArrayList<>();
         try {
             System.out.println("Server " + serverNumber + " is running on port " + serverSocket.getLocalPort());
 
             while (true) {
-                Socket socket = new Socket();
-                if (currentUsers.get() < maxUsers) {
-                    socket = serverSocket.accept();
+                if (currentUsers.get() < MAX_USERS) {
+                    Socket socket = serverSocket.accept();
+                    connectedClients.add(socket);
                     System.out.println("Client connected on server " + serverNumber);
                     currentUsers.getAndIncrement();
-                    Socket finalSocket = socket;
-                    new Thread(() -> {
-                        try {
-                            handleClientConnection(finalSocket, serverNumber);
-                        } finally {
-                            currentUsers.getAndDecrement();
-                            System.out.println("Client disconnected from server " + serverNumber);
+
+                    new Thread(new ClientHandler(socket, serverNumber, randomIntegers)).start();
+
+                    if (currentUsers.get() == MAX_USERS) {
+                        for (Socket clientSocket : connectedClients) {
+                            PrintWriter pw = new PrintWriter(clientSocket.getOutputStream(), true);
+                            pw.println("START");
+                            pw.println(randomIntegers.getFirst());
                         }
-                    }).start();
-                }
-                if(currentUsers.get() == maxUsers && socket.isConnected()){
-                    PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
-                    pw.println("START");
-                    System.out.println("Game started on server " + serverNumber);
+                        System.out.println("Game started on server " + serverNumber);
+                    }
                 }
             }
         } catch (IOException e) {
             System.out.println("Error in server " + serverNumber + ": " + e.getMessage());
-        }
-    }
-
-
-    private static void handleClientConnection(Socket socket, int serverNumber) {
-        try (BufferedReader bf = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-            String message;
-            while ((message = bf.readLine()) != null) {
-                System.out.println("Server " + serverNumber + " received: " + message);
-            }
-        } catch (IOException e) {
-            System.out.println("Client disconnected from server " + serverNumber);
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                System.out.println("Error closing socket on server " + serverNumber + ": " + e.getMessage());
-            }
         }
     }
 }
