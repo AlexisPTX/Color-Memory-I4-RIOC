@@ -1,10 +1,10 @@
 package pinoteaux.projetrioc.gamepart;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
-import javafx.animation.Timeline;
+import javafx.animation.SequentialTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -16,87 +16,76 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 public class Simon {
     private final ControllerSimon controller;
-    private Socket socket;
-    private Chrono chrono;
+    final Socket socket;
 
     private int sequenceActual = 1;
     private int currentPlayerIndex = 0;
-    private final List<Integer> randomIntegers = new ArrayList<>();
+    private List<Integer> randomIntegers = new ArrayList<>();
 
-    public Simon(ControllerSimon controller, Socket socket, Chrono chrono, String mode) {
+    public Simon(ControllerSimon controller, Socket socket, Chrono chrono) {
         this.controller = controller;
         this.socket = socket;
-        this.chrono = chrono;
-        this.chrono.startChrono();
-        initList("SOLO");
-        startGame();
+        chrono.startChrono();
+        initList();
+    }
+    public Simon(ControllerSimon controller, Socket socket, Chrono chrono, int firstInt) {
+        this.controller = controller;
+        this.socket = socket;
+        chrono.startChrono();
+        this.randomIntegers.add(firstInt);
     }
 
-    private void initList(String mode) {
-        if(mode.equals("SOLO")) {
-            for (int i = 0; i < 100; i++) {
-                randomIntegers.add(new Random().nextInt(1, 5));
-            }
-        }else if(mode.equals("MULTI"))  {
-            try{
-                BufferedReader bf = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-                randomIntegers.set(0, Integer.parseInt(bf.readLine()));
-            }
-            catch(IOException e){e.printStackTrace();}
+    private void initList() {
+        for (int i = 0; i < 100; i++) {
+            this.randomIntegers.add(new Random().nextInt(1, 5));
         }
     }
+
 
     // Méthode pour afficher la séquence actuelle
     public void displaySequence() {
-        this.controller.updateSequence(sequenceActual);
+        this.controller.updateSequence(this.sequenceActual);
         this.controller.disableShape();
-        Timeline timeline = new Timeline();
-        PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
 
-        for (int i = 0; i < sequenceActual; i++) {
+        SequentialTransition sequence = new SequentialTransition();
+        for (int i = 0; i < this.sequenceActual; i++) {
             int index = i;
-            if (index == 0) {
-                pause.play();
-            }
 
-            KeyFrame brightFrame = new KeyFrame(Duration.seconds(index), event -> {
-                this.controller.blinkShape(randomIntegers.get(index), "BRIGHT");
-            });
-            KeyFrame darkFrame = new KeyFrame(Duration.seconds(index + 0.5), event -> {
-                this.controller.blinkShape(randomIntegers.get(index), "DARK");
-            });
+            PauseTransition bright = new PauseTransition(Duration.seconds(0.5));
+            bright.setOnFinished(event -> this.controller.blinkShape(this.randomIntegers.get(index), "BRIGHT"));
 
-            timeline.getKeyFrames().addAll(brightFrame, darkFrame);
+            PauseTransition dark = new PauseTransition(Duration.seconds(0.5));
+            dark.setOnFinished(event -> this.controller.blinkShape(this.randomIntegers.get(index), "DARK"));
+
+            sequence.getChildren().addAll(bright, dark);
         }
 
-        pause.setOnFinished(eventP -> {
-            timeline.setOnFinished(eventF -> {
-                this.controller.enableShape();
-            });
-            timeline.play();
-        });
+        sequence.setOnFinished(event -> this.controller.enableShape());
+        sequence.play();
     }
+
 
     public void checkAnswer(int userAnswer) {
         if(this.socket == null) {
-            if (randomIntegers.get(currentPlayerIndex) == userAnswer) {
-                currentPlayerIndex++;
+            if (this.randomIntegers.get(this.currentPlayerIndex) == userAnswer) {
+                this.currentPlayerIndex++;
 
-                if (currentPlayerIndex == sequenceActual) {
-                    sequenceActual++;
-                    currentPlayerIndex = 0;
+                if (this.currentPlayerIndex == this.sequenceActual) {
+                    this.sequenceActual++;
+                    this.currentPlayerIndex = 0;
                     this.controller.updateMessageSequence("SUIVANT");
                     javafx.application.Platform.runLater(this::displaySequence);
                 }
 
             } else {
                 this.controller.updateMessageSequence("RESET");
-                currentPlayerIndex = 0;
+                this.currentPlayerIndex = 0;
                 javafx.application.Platform.runLater(this::displaySequence);
             }
         }else{
@@ -107,20 +96,47 @@ public class Simon {
                 Gson gson = new Gson();
                 JsonObject json = new JsonObject();
                 json.addProperty("userAnswer", userAnswer);
-                json.addProperty("sequenceActual", sequenceActual);
-                json.addProperty("currentPlayerIndex", currentPlayerIndex);
+                json.addProperty("sequenceActual", this.sequenceActual);
+                json.addProperty("currentPlayerIndex", this.currentPlayerIndex);
 
                 pw.println(gson.toJson(json));
+                pw.flush();
 
                 String responseJson;
-                while((responseJson = bf.readLine()) != null){
-                    JsonObject response = gson.fromJson(responseJson, JsonObject.class);
-                    currentPlayerIndex = response.get("currentPlayerIndex").getAsInt();
-                    sequenceActual = response.get("sequenceActual").getAsInt();
-                    javafx.application.Platform.runLater(this::displaySequence);
+                while ((responseJson = bf.readLine()) != null) {
+                    if (!responseJson.isBlank()) { // Vérifie que la ligne n'est pas vide
+                        JsonObject response = gson.fromJson(responseJson, JsonObject.class);
+                        if (response != null) { // Vérifie que le parsing JSON a réussi
+                            if (response.has("currentPlayerIndex")) {
+                                this.currentPlayerIndex = response.get("currentPlayerIndex").getAsInt();
+                            }
+                            if (response.has("sequenceActual")) {
+                                this.sequenceActual = response.get("sequenceActual").getAsInt();
+                                System.out.println("Sequence actual : " + this.sequenceActual);
+                            }
+                            if (response.has("randomIntegers")) {
+                                JsonArray jsonArray = response.getAsJsonArray("randomIntegers");
+                                this.randomIntegers = new ArrayList<>();
+                                for (int i = 0; i < jsonArray.size(); i++) {
+                                    this.randomIntegers.add(jsonArray.get(i).getAsInt());
+                                }
+                            }
+                            if (response.has("message")) {
+                                if(!response.get("message").getAsString().equals("VALID")) {
+                                    this.controller.updateMessageSequence(response.get("message").getAsString());
+                                    javafx.application.Platform.runLater(this::displaySequence);
+                                }
+                                break;
+                            }
+                        } else {
+                            System.err.println("[Simon] - Invalid JSON received: " + responseJson);
+                        }
+                    } else {
+                        System.err.println("[Simon] - Blank line received from server.");
+                    }
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                System.out.println("[Simon] - Failed to checkAnswer : " + e.getMessage());
             }
         }
     }

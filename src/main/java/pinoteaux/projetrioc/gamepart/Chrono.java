@@ -30,7 +30,6 @@ public class Chrono {
             return;
         }
 
-        System.out.println("Starting chrono");
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             timeInSeconds--;
             this.controller.updateTemps(formatTime(timeInSeconds));

@@ -5,13 +5,14 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Server {
-    private static final int MAX_USERS = 3;
+    private static final int MAX_USERS = 2;
     private static final int[] PORTS = {1111, 2222, 3333, 4444, 5555};
-    private static final List<Integer> randomIntegers = new ArrayList<>();
+    private static final List<Integer> randomIntegers = new CopyOnWriteArrayList<>();
 
     public static void main(String[] args) throws IOException {
         for (int i = 0; i < PORTS.length; i++) {
@@ -43,9 +44,13 @@ public class Server {
                         for (Socket clientSocket : connectedClients) {
                             PrintWriter pw = new PrintWriter(clientSocket.getOutputStream(), true);
                             pw.println("START");
-                            pw.println(randomIntegers.getFirst());
+                            pw.flush();
+                            pw.println(randomIntegers.get(0));
+                            pw.flush();
                         }
                         System.out.println("Game started on server " + serverNumber);
+                        System.out.println("Server test first integer: " + randomIntegers.get(0));
+                        break;
                     }
                 }
             }

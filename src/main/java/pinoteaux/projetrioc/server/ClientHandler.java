@@ -3,6 +3,7 @@ package pinoteaux.projetrioc.server;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,60 +18,85 @@ public class ClientHandler implements Runnable {
     private final List<Integer> randomIntegers;
     private int sequenceActual = 1;
     private int currentPlayerIndex = 0;
+    private BufferedReader bf;
+    private PrintWriter pw;
 
     public ClientHandler(Socket socket, int serverNumber, List<Integer> randomIntegers) {
         this.socket = socket;
         this.serverNumber = serverNumber;
         this.randomIntegers = randomIntegers;
-    }
+        try {
+            this.bf = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+            this.pw = new PrintWriter(this.socket.getOutputStream(), true);
+        } catch (IOException e) {
+            System.err.println("[ClientHandler] - Error reading from socket" + e.getMessage());
+        }
 
+    }
     @Override
     public void run() {
         Gson gson = new Gson();
+
         try {
-            BufferedReader bf = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
 
             String jsonString;
-            while((jsonString = bf.readLine()) == null);
-            JsonObject json = gson.fromJson(jsonString, JsonObject.class);
-
-            // Récupération des valeurs JSON
-            int userAnswer = json.get("userAnswer").getAsInt();
-            int sequenceActual = json.get("sequenceActual").getAsInt();
-            int currentPlayerIndex = json.get("currentPlayerIndex").getAsInt();
-
-            // Vérification de la réponse de l'utilisateur
-            if (randomIntegers.get(currentPlayerIndex) == userAnswer) {
-                currentPlayerIndex++;
-                if (currentPlayerIndex == sequenceActual) {
-                    sequenceActual++;
-                    currentPlayerIndex = 0;
+            while ((jsonString = this.bf.readLine()) != null) {
+                try {
+                    JsonObject json = gson.fromJson(jsonString, JsonObject.class);
+                    if (json.has("userAnswer")) {
+                        int userAnswer = json.get("userAnswer").getAsInt();
+                        handleUserAnswer(userAnswer);
+                    } else {
+                        System.err.println("[ClientHandler] - Invalid message format received.");
+                    }
+                } catch (JsonSyntaxException e) {
+                    System.err.println("[ClientHandler] - Error parsing JSON: " + e.getMessage());
                 }
-
-                // Construction de la réponse JSON pour "SUIVANT"
-                JsonObject response = new JsonObject();
-                response.addProperty("sequenceActual", sequenceActual);
-                response.addProperty("currentPlayerIndex", currentPlayerIndex);
-                response.addProperty("message", "SUIVANT");
-                pw.println(gson.toJson(response));
-
-            } else {
-                // Construction de la réponse JSON pour "RESET"
-                JsonObject response = new JsonObject();
-                response.addProperty("sequenceActual", sequenceActual);
-                response.addProperty("currentPlayerIndex", currentPlayerIndex);
-
-                JsonArray jsonArray = new JsonArray();
-                randomIntegers.subList(0, sequenceActual).forEach(jsonArray::add);
-                response.add("randomIntegers", jsonArray);
-                response.addProperty("message", "RESET");
-                pw.println(gson.toJson(response));
             }
 
+
         } catch (IOException e) {
-            System.out.println("Client disconnected from server " + serverNumber);
+            System.out.println("[ClientHandler] - Client disconnected from server " + serverNumber);
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                System.err.println("[ClientHandler] - Error closing socket: " + e.getMessage());
+            }
         }
     }
 
+    private void handleUserAnswer(int userAnswer) {
+        Gson gson = new Gson();
+        JsonObject responseJson;
+        if (randomIntegers.get(this.currentPlayerIndex) == userAnswer) {
+            this.currentPlayerIndex++;
+            responseJson = createResponse("VALID");
+            if (this.currentPlayerIndex == this.sequenceActual) {
+                this.sequenceActual++;
+                this.currentPlayerIndex = 0;
+                responseJson = createResponse("SUIVANT");
+            }
+        } else {
+            this.currentPlayerIndex = 0;
+            responseJson = createResponse("RESET");
+        }
+        this.pw.println(gson.toJson(responseJson));
+        this.pw.flush();
+    }
+
+    private JsonObject createResponse(String message) {
+        JsonObject response = new JsonObject();
+        if(!message.equals("VALID")){
+            response.addProperty("sequenceActual", this.sequenceActual);
+            response.addProperty("currentPlayerIndex", this.currentPlayerIndex);
+            JsonArray randomIntegersJson = new JsonArray();
+            for (int i : this.randomIntegers.subList(0, this.sequenceActual)) {
+                randomIntegersJson.add(i);
+            }
+            response.add("randomIntegers", randomIntegersJson);
+        }
+        response.addProperty("message", message);
+        return response;
+    }
 }

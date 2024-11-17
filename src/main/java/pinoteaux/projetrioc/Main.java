@@ -38,7 +38,7 @@ public class Main extends Application {
     }
 
     // Méthode pour lancer le jeu Simon
-    public void startSimonGame(Stage stage,Socket socketServ, String mode) {
+    public void startSimonGame(Stage stage,Socket socketServ, int firstInt) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("gamepart/simon.fxml"));
         Parent root = null;
         try {
@@ -50,7 +50,12 @@ public class Main extends Application {
         // Obtenez le contrôleur de Simon et configurez-le
         ControllerSimon controller = fxmlLoader.getController();
         Chrono chrono = new Chrono(1,controller);
-        Simon simon = new Simon(controller,null,chrono,mode);
+        Simon simon;
+        if(firstInt == 0) {
+            simon = new Simon(controller, socketServ, chrono);
+        }else{
+            simon = new Simon(controller, socketServ, chrono, firstInt);
+        }
         controller.setSimon(simon);
         chrono.setSimon(simon);
 
@@ -83,27 +88,21 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
     }
-    public void attenteDebutTournoi(Stage stage, Socket socketServ, String mode, int port) {
+    public void attenteDebutTournoi(Stage stage, Socket socketServ) {
             BufferedReader bf = null;
             try {
                 bf = new BufferedReader(new InputStreamReader(socketServ.getInputStream()));
                 String line;
                 while ((line = bf.readLine()) != null) {
                     if (line.equals("START")) {
-                        startSimonGame(stage, socketServ, mode);
-                        break;
+                        if ((line = bf.readLine()) != null) {
+                            startSimonGame(stage, socketServ, Integer.parseInt(line));
+                            break;
+                        }
                     }
                 }
             } catch (IOException e) {
                 System.out.println("Error in Main attenteDebutTournoi : " + e.getMessage());
-            } finally {
-                if (bf != null) {
-                    try {
-                        bf.close();
-                    } catch (IOException e) {
-                        System.err.println("Error closing BufferedReader: " + e.getMessage());
-                    }
-                }
             }
     }
 

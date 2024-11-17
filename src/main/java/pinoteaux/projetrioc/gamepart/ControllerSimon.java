@@ -34,12 +34,12 @@ public class ControllerSimon {
 
     public void setSimon(Simon simon) {
         this.simon = simon;
-        finGroup.setVisible(false);
+        this.finGroup.setVisible(false);
     }
 
     public void stopSimon(){
-        jeuGroup.setMouseTransparent(true);
-        finGroup.setVisible(true);
+        this.jeuGroup.setMouseTransparent(true);
+        this.finGroup.setVisible(true);
     }
 
     public void actionRed(MouseEvent e) {
@@ -58,7 +58,7 @@ public class ControllerSimon {
         handleAction(e, 1);
     }
 
-    private void handleAction(MouseEvent e, int colorIndex) {
+    public void handleAction(MouseEvent e, int colorIndex) {
         disableShape();
         Timeline timeline = new Timeline();
         KeyFrame brightFrame = new KeyFrame(Duration.seconds(0.1), event -> {
@@ -71,42 +71,44 @@ public class ControllerSimon {
 
         timeline.getKeyFrames().addAll(brightFrame, darkFrame, delayFrame);
         timeline.setOnFinished(event -> {
-            simon.checkAnswer(colorIndex); // Appeler checkAnswer après la fin de la timeline
+            this.simon.checkAnswer(colorIndex); // Appeler checkAnswer après la fin de la timeline
             enableShape();
         });
         timeline.play();
+
+
     }
 
     public void blinkShape(int i, String s) {
         if(s.equals("DARK")) {
             switch (i) {
-                case 1 -> green.setFill(Color.GREEN);
-                case 2 -> blue.setFill(Color.MIDNIGHTBLUE);
-                case 3 -> yellow.setFill(Color.DARKGOLDENROD);
-                case 4 -> red.setFill(Color.DARKRED);
+                case 1 -> this.green.setFill(Color.GREEN);
+                case 2 -> this.blue.setFill(Color.MIDNIGHTBLUE);
+                case 3 -> this.yellow.setFill(Color.DARKGOLDENROD);
+                case 4 -> this.red.setFill(Color.DARKRED);
             }
         } else if(s.equals("BRIGHT")) {
             switch (i) {
-                case 1 -> green.setFill(Color.LIME);
-                case 2 -> blue.setFill(Color.BLUE);
-                case 3 -> yellow.setFill(Color.YELLOW);
-                case 4 -> red.setFill(Color.RED);
+                case 1 -> this.green.setFill(Color.LIME);
+                case 2 -> this.blue.setFill(Color.BLUE);
+                case 3 -> this.yellow.setFill(Color.YELLOW);
+                case 4 -> this.red.setFill(Color.RED);
             }
         }
     }
 
     public void disableShape() {
-        red.setDisable(true);
-        blue.setDisable(true);
-        green.setDisable(true);
-        yellow.setDisable(true);
+        this.red.setDisable(true);
+        this.blue.setDisable(true);
+        this.green.setDisable(true);
+        this.yellow.setDisable(true);
     }
 
     public void enableShape() {
-        red.setDisable(false);
-        blue.setDisable(false);
-        green.setDisable(false);
-        yellow.setDisable(false);
+        this.red.setDisable(false);
+        this.blue.setDisable(false);
+        this.green.setDisable(false);
+        this.yellow.setDisable(false);
     }
 
     public void updateTemps(String temps) {
