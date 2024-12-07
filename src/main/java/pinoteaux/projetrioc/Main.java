@@ -4,10 +4,13 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import pinoteaux.projetrioc.gamepart.Chrono;
 import pinoteaux.projetrioc.gamepart.ControllerSimon;
 import pinoteaux.projetrioc.gamepart.Simon;
+import pinoteaux.projetrioc.menu.ChatHandler;
+import pinoteaux.projetrioc.menu.ControllerChat;
 import pinoteaux.projetrioc.menu.ControllerChoixServer;
 import pinoteaux.projetrioc.menu.ControllerMenu;
 
@@ -24,18 +27,22 @@ public class Main extends Application {
         try {
             root = fxmlLoader.load();
         } catch (IOException e) {
-            System.out.println("Error in Main loading menu.fxml : " + e.getMessage());
+            System.out.println("Error in Main loading menu.fxml: " + e.getMessage());
         }
 
         ControllerMenu controller = fxmlLoader.getController();
         controller.setMainApp(this);
 
-        Scene scene = new Scene(root, 1000, 800);
+        // Créez le layout avec le chat
+        Parent chatLayout = createChatLayout(root);
+
+        Scene scene = new Scene(chatLayout, 1400, 800);
         stage.setTitle("Menu");
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
+
 
     // Méthode pour lancer le jeu Simon
     public void startSimonGame(Stage stage,Socket socketServ, int firstInt) {
@@ -48,15 +55,15 @@ public class Main extends Application {
         }
 
         // Obtenez le contrôleur de Simon et configurez-le
-        ControllerSimon controller = fxmlLoader.getController();
-        Chrono chrono = new Chrono(1,controller);
+        ControllerSimon controllerJeu = fxmlLoader.getController();
+        Chrono chrono = new Chrono(1,controllerJeu);
         Simon simon;
         if(firstInt == 0) {
-            simon = new Simon(controller, socketServ, chrono);
+            simon = new Simon(controllerJeu, socketServ, chrono);
         }else{
-            simon = new Simon(controller, socketServ, chrono, firstInt);
+            simon = new Simon(controllerJeu, socketServ, chrono, firstInt);
         }
-        controller.setSimon(simon);
+        controllerJeu.setSimon(simon);
         chrono.setSimon(simon);
 
         // Créez la scène pour Simon
@@ -77,17 +84,21 @@ public class Main extends Application {
         try {
             root = fxmlLoader.load();
         } catch (IOException e) {
-            System.out.println("Error in Main loading choixServer.fxml : " + e.getMessage());
+            System.out.println("Error in Main loading choixServer.fxml: " + e.getMessage());
         }
-        ControllerChoixServer controller = fxmlLoader.getController();
-        controller.setMainApp(this);
 
-        Scene scene = new Scene(root, 1000, 800);
-        stage.setTitle("Color Memory");
+        ControllerChoixServer controllerServer = fxmlLoader.getController();
+        controllerServer.setMainApp(this);
+
+        Parent chatLayout = createChatLayout(root);
+
+        Scene scene = new Scene(chatLayout, 1400, 800);
+        stage.setTitle("Choix Server");
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
+
     public void attenteDebutTournoi(Stage stage, Socket socketServ) {
             BufferedReader bf = null;
             try {
@@ -105,6 +116,48 @@ public class Main extends Application {
                 System.out.println("Error in Main attenteDebutTournoi : " + e.getMessage());
             }
     }
+
+    private Parent createChatLayout(Parent mainContent) {
+        FXMLLoader chatLoader = new FXMLLoader(getClass().getResource("menu/chat.fxml"));
+        Parent chatRoot = null;
+        try {
+            chatRoot = chatLoader.load();
+
+            // Obtenez le contrôleur du chat
+            ControllerChat controllerChat = chatLoader.getController();
+
+            // Crée le socket et démarre le ChatHandler
+            Socket socket = new Socket("localhost", 9999); // Adresse/port du serveur
+            ChatHandler chatHandler = startChatHandler(socket, controllerChat);
+
+            // Passe le ChatHandler au contrôleur pour envoyer des messages
+            controllerChat.setChatHandler(chatHandler);
+
+        } catch (IOException e) {
+            System.out.println("Error loading chat.fxml: " + e.getMessage());
+        }
+
+        BorderPane layout = new BorderPane();
+        layout.setLeft(chatRoot);
+        layout.setCenter(mainContent);
+
+        return layout;
+    }
+
+
+    private ChatHandler startChatHandler(Socket socket, ControllerChat controllerChat) {
+        ChatHandler chatHandler = null;
+        chatHandler = new ChatHandler(socket);
+
+        // Injecte le contrôleur dans le ChatHandler
+        chatHandler.setControllerChat(controllerChat);
+
+        // Démarre le ChatHandler dans un thread séparé
+        new Thread(chatHandler).start();
+        return chatHandler;
+    }
+
+
 
 
     public static void main(String[] args) {

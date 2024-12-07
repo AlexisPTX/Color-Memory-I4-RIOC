@@ -95,6 +95,7 @@ public class Simon {
 
                 Gson gson = new Gson();
                 JsonObject json = new JsonObject();
+                json.addProperty("type", "GAME");
                 json.addProperty("userAnswer", userAnswer);
                 json.addProperty("sequenceActual", this.sequenceActual);
                 json.addProperty("currentPlayerIndex", this.currentPlayerIndex);
