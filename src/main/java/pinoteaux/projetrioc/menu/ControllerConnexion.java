@@ -23,7 +23,7 @@ public class ControllerConnexion {
         if (mainApp != null) {
             String user = usernameField.getText();
             if(!user.isEmpty()) {
-                mainApp.startMain((Stage) ((Node) e.getSource()).getScene().getWindow(), user);
+                mainApp.startMain(user);
             }else{
                 message.setVisible(true);
             }

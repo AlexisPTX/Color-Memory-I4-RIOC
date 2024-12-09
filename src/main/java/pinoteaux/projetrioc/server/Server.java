@@ -1,5 +1,8 @@
 package pinoteaux.projetrioc.server;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -23,7 +26,7 @@ public class Server {
             if(i == 0){
                 new Thread(() -> handleClient(serverSocket, serverNumber,200)).start();
             } else {
-                new Thread(() -> handleClient(serverSocket, serverNumber, 5)).start();
+                new Thread(() -> handleClient(serverSocket, serverNumber, 1)).start();
             }
         }
     }
@@ -45,9 +48,12 @@ public class Server {
                         if (currentUsers.get() == maxUsers) {
                             for (Socket clientSocket : connectedClients) {
                                 PrintWriter pw = new PrintWriter(clientSocket.getOutputStream(), true);
-                                pw.println("START");
-                                pw.flush();
-                                pw.println(randomIntegers.get(0));
+                                Gson gson = new Gson();
+                                JsonObject json = new JsonObject();
+                                json.addProperty("type", "SERVER");
+                                json.addProperty("message", "START");
+                                json.addProperty("intDebut", randomIntegers.get(0));
+                                pw.println(gson.toJson(json));
                                 pw.flush();
                             }
                             System.out.println("Game started on server " + serverNumber);

@@ -22,17 +22,17 @@ public class ControllerMenu {
 
     public void actionSoloButton(ActionEvent e) {
         if (mainApp != null) {
-            mainApp.startSimonGame((Stage) ((Node) e.getSource()).getScene().getWindow(), null, 0);
+            mainApp.startSimonGame(0);
         }
     }
     public void actionTournoisButton(ActionEvent e) {
         if (mainApp != null) {
-            mainApp.startChoixServer((Stage) ((Node) e.getSource()).getScene().getWindow());
+            mainApp.startChoixServer();
         }
     }
     public void actionClassementButton(ActionEvent e) {
         if (mainApp != null) {
-            mainApp.startClassement((Stage) ((Node) e.getSource()).getScene().getWindow());
+            mainApp.startClassement();
         }
 
     }

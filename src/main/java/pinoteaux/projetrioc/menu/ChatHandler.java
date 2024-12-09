@@ -2,12 +2,15 @@ package pinoteaux.projetrioc.menu;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import javafx.application.Platform;
+import pinoteaux.projetrioc.Main;
 
 import java.io.*;
 import java.net.Socket;
 
 public class ChatHandler implements Runnable {
     private volatile boolean running = true;
+    private Main mainApp;
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
@@ -21,6 +24,9 @@ public class ChatHandler implements Runnable {
         } catch (IOException e) {
             System.out.println("[ChatHandler] - Could not open");
         }
+    }
+    public void setSocket(Socket socket) {
+        this.socket = socket;
     }
 
     public void stop() {
@@ -55,6 +61,19 @@ public class ChatHandler implements Runnable {
                                         String pseudo = messageJson.get("pseudo").getAsString();
                                         this.controllerChat.addMessageToUI(text, pseudo);
                                     }
+                                }else if(type.equals("SERVER")){
+                                    if(messageJson.has("message") && messageJson.has("intDebut")){
+                                        int intDebut = messageJson.get("intDebut").getAsInt();
+                                        String messageServ = messageJson.get("message").getAsString();
+                                        if(messageServ.equals("START")){
+                                            Platform.runLater(() -> {
+                                                mainApp.startSimonGame(intDebut);
+                                            });
+
+                                            System.out.println("[ChatHandler] - START game started");
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -69,5 +88,9 @@ public class ChatHandler implements Runnable {
     public void sendMessage(String message) {
         this.out.println(message);
         this.out.flush();
+    }
+
+    public void setMainApp(Main mainApp) {
+        this.mainApp = mainApp;
     }
 }

@@ -42,7 +42,7 @@ public class ControllerChoixServer {
             return; // Exit if socket creation failed
         }
         hideGroup();
-        mainApp.attenteDebutTournoi((Stage) ((Node) e.getSource()).getScene().getWindow(), socket);
+        mainApp.attenteDebutTournoi(socket);
     }
 
     public void actionButtonServer1(ActionEvent e) {

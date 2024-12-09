@@ -23,9 +23,12 @@ public class Main extends Application {
     private String username;
     private Parent chatRoot = null;
     private ChatHandler chatHandler;
+    private Stage actualStage = null;
+    private Socket socketServ;
 
     @Override
     public void start(Stage stage) {
+        actualStage = stage;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("menu/connexion.fxml"));
         Parent root = null;
         try {
@@ -38,22 +41,22 @@ public class Main extends Application {
         controller.setMainApp(this);
 
         Scene scene = new Scene(root, 1400, 800);
-        stage.setTitle("Choix pseudo");
-        stage.setResizable(false);
-        stage.setScene(scene);
+        actualStage.setTitle("Choix pseudo");
+        actualStage.setResizable(false);
+        actualStage.setScene(scene);
 
-        stage.setOnCloseRequest(event -> {
+        actualStage.setOnCloseRequest(event -> {
             if (this.chatHandler != null) {
                 this.chatHandler.stop();
             }
             exit();
         });
 
-        stage.show();
+        actualStage.show();
     }
 
 
-    public void startMain(Stage stage, String username) {
+    public void startMain(String username) {
         this.username = username;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("menu/menu.fxml"));
         Parent root = null;
@@ -67,18 +70,18 @@ public class Main extends Application {
         controllerMenu.setMainApp(this);
 
         // Créez le layout avec le chat
-        Parent chatLayout = createChatLayout(root);
+        Parent chatLayout = createChatLayout(root, "GLOBAL");
 
         Scene scene = new Scene(chatLayout, 1400, 800);
-        stage.setTitle("Menu");
-        stage.setResizable(false);
-        stage.setScene(scene);
-        stage.show();
+        actualStage.setTitle("Menu");
+        actualStage.setResizable(false);
+        actualStage.setScene(scene);
+        actualStage.show();
     }
 
 
     // Méthode pour lancer le jeu Simon
-    public void startSimonGame(Stage stage,Socket socketServ, int firstInt) {
+    public void startSimonGame(int firstInt) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("gamepart/simon.fxml"));
         Parent root = null;
         try {
@@ -101,17 +104,17 @@ public class Main extends Application {
 
         // Créez la scène pour Simon
         Scene scene = new Scene(root, 800, 600);
-        stage.setTitle("Color Memory");
-        stage.setResizable(false);
-        stage.setScene(scene);
-        stage.show();
+        actualStage.setTitle("Color Memory");
+        actualStage.setResizable(false);
+        actualStage.setScene(scene);
+        actualStage.show();
 
         // Démarrez le jeu Simon
         simon.startGame();
     }
-    public void startClassement(Stage stage) {
+    public void startClassement() {
     }
-    public void startChoixServer(Stage stage) {
+    public void startChoixServer() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("menu/choixServer.fxml"));
         Parent root = null;
         try {
@@ -123,36 +126,56 @@ public class Main extends Application {
         ControllerChoixServer controllerServer = fxmlLoader.getController();
         controllerServer.setMainApp(this);
 
-        Parent chatLayout = createChatLayout(root);
+        Parent chatLayout = createChatLayout(root,"");
 
         Scene scene = new Scene(chatLayout, 1400, 800);
-        stage.setTitle("Choix Server");
-        stage.setResizable(false);
-        stage.setScene(scene);
-        stage.show();
+        actualStage.setTitle("Choix Server");
+        actualStage.setResizable(false);
+        actualStage.setScene(scene);
+        actualStage.show();
     }
 
-    public void attenteDebutTournoi(Stage stage, Socket socketServ) {
-            BufferedReader bf = null;
-            try {
-                bf = new BufferedReader(new InputStreamReader(socketServ.getInputStream()));
-                String line;
-                while ((line = bf.readLine()) != null) {
-                    if (line.equals("START")) {
-                        if ((line = bf.readLine()) != null) {
-                            startSimonGame(stage, socketServ, Integer.parseInt(line));
-                            break;
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                System.out.println("Error in Main attenteDebutTournoi : " + e.getMessage());
-            }
-    }
+    public void attenteDebutTournoi(Socket socketServ) {
+        try {
+            this.socketServ.close();
+        } catch (IOException e) {
+            System.out.println("[Main] - Failed to close socket");
+        }
+        this.socketServ = socketServ;
+        this.chatHandler.setSocket(socketServ);
 
-    private Parent createChatLayout(Parent mainContent) {
+        // Charge le nouveau chat layout
         FXMLLoader chatLoader = new FXMLLoader(getClass().getResource("menu/chat.fxml"));
-        if(this.chatRoot == null) {
+        Parent newChatRoot = null;
+        try {
+            newChatRoot = chatLoader.load();
+            ControllerChat controllerChat = chatLoader.getController();
+            startChatHandler(this.socketServ, controllerChat);
+            controllerChat.setChatHandler(this.chatHandler, this.username);
+            this.chatHandler.setMainApp(this);
+        } catch (IOException e) {
+            System.out.println("Error loading chat.fxml: " + e.getMessage());
+            return;
+        }
+
+        // Récupère le layout principal actuel
+        Parent root = actualStage.getScene().getRoot();
+        if (root instanceof BorderPane layout) {
+            layout.setLeft(newChatRoot); // Remplace l'ancien chat par le nouveau
+        } else {
+            System.out.println("Root is not a BorderPane. Cannot update layout.");
+        }
+
+        // Ajuste la scène si nécessaire
+        actualStage.setTitle("Attente Début Tournoi");
+        actualStage.setResizable(false);
+        actualStage.show();
+    }
+
+
+    private Parent createChatLayout(Parent mainContent, String affichage) {
+        FXMLLoader chatLoader = new FXMLLoader(getClass().getResource("menu/chat.fxml"));
+        if(affichage.equals("GLOBAL")) {
             try {
                 this.chatRoot = chatLoader.load();
 
@@ -160,10 +183,21 @@ public class Main extends Application {
                 ControllerChat controllerChat = chatLoader.getController();
 
                 // Crée le socket et démarre le ChatHandler
-                Socket socket = new Socket("localhost", 9999); // Adresse/port du serveur
-                startChatHandler(socket, controllerChat);
+                this.socketServ = new Socket("localhost", 9999); // Adresse/port du serveur
+                startChatHandler(this.socketServ, controllerChat);
 
                 // Passe le ChatHandler au contrôleur pour envoyer des messages
+                controllerChat.setChatHandler(this.chatHandler, this.username);
+
+            } catch (IOException e) {
+                System.out.println("Error loading chat.fxml: " + e.getMessage());
+            }
+        }else if(affichage.equals("SERVER")){
+            try {
+                this.chatRoot = chatLoader.load();
+                ControllerChat controllerChat = chatLoader.getController();
+
+                chatHandler.setSocket(this.socketServ);
                 controllerChat.setChatHandler(this.chatHandler, this.username);
 
             } catch (IOException e) {
@@ -185,6 +219,10 @@ public class Main extends Application {
 
         // Démarre le ChatHandler dans un thread séparé
         new Thread(this.chatHandler).start();
+    }
+
+    public Stage getStage(){
+        return this.actualStage;
     }
 
 
