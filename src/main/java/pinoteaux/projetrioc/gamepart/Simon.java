@@ -27,18 +27,21 @@ public class Simon {
     private int sequenceActual = 1;
     private int currentPlayerIndex = 0;
     private List<Integer> randomIntegers = new ArrayList<>();
+    private String username;
 
-    public Simon(ControllerSimon controller, Socket socket, Chrono chrono) {
+    public Simon(ControllerSimon controller, Socket socket, Chrono chrono, String username) {
         this.controller = controller;
         this.socket = socket;
         chrono.startChrono();
         initList();
+        this.username = username;
     }
-    public Simon(ControllerSimon controller, Socket socket, Chrono chrono, int firstInt) {
+    public Simon(ControllerSimon controller, Socket socket, Chrono chrono, int firstInt, String username) {
         this.controller = controller;
         this.socket = socket;
         chrono.startChrono();
         this.randomIntegers.add(firstInt);
+        this.username = username;
     }
 
     private void initList() {
@@ -161,5 +164,6 @@ public class Simon {
 
     public void stopGame() {
         this.controller.stopSimon();
+        //sendResult(this.username);
     }
 }

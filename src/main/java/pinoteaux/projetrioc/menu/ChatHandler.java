@@ -7,6 +7,7 @@ import java.io.*;
 import java.net.Socket;
 
 public class ChatHandler implements Runnable {
+    private volatile boolean running = true;
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
@@ -22,6 +23,15 @@ public class ChatHandler implements Runnable {
         }
     }
 
+    public void stop() {
+        this.running = false; // Signal to stop the thread
+        try {
+            this.socket.close(); // Close the socket to release resources
+        } catch (IOException e) {
+            System.out.println("Error closing socket: " + e.getMessage());
+        }
+    }
+
     // Injecte le contrôleur pour mettre à jour l'interface
     public void setControllerChat(ControllerChat controllerChat) {
         this.controllerChat = controllerChat;
@@ -29,28 +39,30 @@ public class ChatHandler implements Runnable {
 
     @Override
     public void run() {
-        try {
-            Gson gson = new Gson();
-            String message;
-            while ((message = in.readLine()) != null) {
-                if (!message.isBlank()) {
-                    JsonObject messageJson = gson.fromJson(message, JsonObject.class);
-                    if (messageJson != null) { // Vérifie que le parsing JSON a réussi
-                        if (messageJson.has("type")) {
-                            String type = messageJson.get("type").getAsString();
-                            if (type.equals("CHAT")) {
-                                if (messageJson.has("message")) {
-                                    String text = messageJson.get("message").getAsString();
-                                    this.controllerChat.addMessageToUI(text,"pseudo");
-                                    System.out.println("Received: " + text);
+        if(this.running) {
+            try {
+                Gson gson = new Gson();
+                String message;
+                while ((message = this.in.readLine()) != null) {
+                    if (!message.isBlank()) {
+                        JsonObject messageJson = gson.fromJson(message, JsonObject.class);
+                        if (messageJson != null) { // Vérifie que le parsing JSON a réussi
+                            if (messageJson.has("type")) {
+                                String type = messageJson.get("type").getAsString();
+                                if (type.equals("CHAT")) {
+                                    if (messageJson.has("message") && messageJson.has("pseudo")) {
+                                        String text = messageJson.get("message").getAsString();
+                                        String pseudo = messageJson.get("pseudo").getAsString();
+                                        this.controllerChat.addMessageToUI(text, pseudo);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            } catch (IOException e) {
+                System.out.println("Error in ChatHandler: " + e.getMessage());
             }
-        } catch (IOException e) {
-            System.out.println("Error in ChatHandler: " + e.getMessage());
         }
     }
 

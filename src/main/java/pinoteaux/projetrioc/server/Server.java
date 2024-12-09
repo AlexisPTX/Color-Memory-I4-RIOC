@@ -39,7 +39,6 @@ public class Server {
                 if (currentUsers.get() < maxUsers) {
                     Socket socket = serverSocket.accept();
                     connectedClients.add(socket);
-                    System.out.println("Client connected on server " + serverNumber);
                     currentUsers.getAndIncrement();
                     if(serverSocket.getLocalPort() != 9999){
                         new Thread(new ClientHandler(socket, serverNumber, new ArrayList<>(randomIntegers), connectedClients)).start();

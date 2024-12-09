@@ -61,11 +61,13 @@ public class ClientHandler implements Runnable {
                     if(json.has("type")){
                         String type = json.get("type").getAsString();
                         if(type.equals("CHAT")){
-                            if (json.has("message")) {
+                            if (json.has("message") && json.has("pseudo")) {
                                 String message = json.get("message").getAsString();
+                                String pseudo = json.get("pseudo").getAsString();
                                 json = new JsonObject();
                                 json.addProperty("type", "CHAT");
                                 json.addProperty("message", message);
+                                json.addProperty("pseudo", pseudo);
                                 System.out.println(json);
                                 for(Socket otherSocket : listClients){
                                     if (!otherSocket.equals(this.socket)) {

@@ -18,9 +18,11 @@ public class ControllerChat {
     private Button buttonSend;
 
     private ChatHandler chatHandler;
+    private String username;
 
-    public void setChatHandler(ChatHandler chatHandler) {
+    public void setChatHandler(ChatHandler chatHandler, String username) {
         this.chatHandler = chatHandler;
+        this.username = username;
     }
 
     public void initialize() {
@@ -31,6 +33,7 @@ public class ControllerChat {
             if (!message.isEmpty() && chatHandler != null) {
                 json.addProperty("type", "CHAT");
                 json.addProperty("message", message);
+                json.addProperty("pseudo", this.username);
                 chatHandler.sendMessage(gson.toJson(json)); // Envoie le message au serveur
                 addMessageToUI(message, "Moi"); // Affiche le message localement
                 messageInput.clear();
