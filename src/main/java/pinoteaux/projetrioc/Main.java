@@ -11,9 +11,7 @@ import pinoteaux.projetrioc.gamepart.ControllerSimon;
 import pinoteaux.projetrioc.gamepart.Simon;
 import pinoteaux.projetrioc.menu.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
 
 import static javafx.application.Platform.exit;

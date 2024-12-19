@@ -26,7 +26,7 @@ public class Server {
             if(i == 0){
                 new Thread(() -> handleClient(serverSocket, serverNumber,200)).start();
             } else {
-                new Thread(() -> handleClient(serverSocket, serverNumber, 1)).start();
+                new Thread(() -> handleClient(serverSocket, serverNumber, 2)).start();
             }
         }
     }

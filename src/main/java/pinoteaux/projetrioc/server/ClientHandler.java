@@ -93,12 +93,6 @@ public class ClientHandler implements Runnable {
             }
         } catch (IOException e) {
             System.out.println("[ClientHandler] - Client disconnected from server " + serverNumber);
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                System.err.println("[ClientHandler] - Error closing socket: " + e.getMessage());
-            }
         }
     }
 
