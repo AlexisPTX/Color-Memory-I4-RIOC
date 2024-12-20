@@ -27,9 +27,9 @@ Une fois connecté, l'utilisateur accède à un menu principal qui propose plusi
 Le jeu teste la mémoire de l'utilisateur en lui demandant de répéter une séquence de couleurs dans le bon ordre. Le mode de jeu peut varier selon que l'utilisateur joue en solo ou en tournoi.
 
 - **FXML utilisé** : `colorMemory.fxml`
-- **Contrôleur** : `ControllerSimon`
+- **Contrôleur** : `ControllerColorMemory`
 - **Classes principales** :
-    - `Simon` : Contient la logique du jeu.
+    - `ColorMemory` : Contient la logique du jeu.
     - `Chrono` : Gestion du chronomètre.
 
 #### Fonctionnalités du jeu
@@ -51,7 +51,7 @@ Le programme inclut un système de chat qui permet aux joueurs de communiquer en
 ### Structure des packages
 - **`pinoteaux.projetrioc`** : Point d’entrée du programme.
 - **`pinoteaux.projetrioc.menu`** : Gère la connexion, le menu principal et la sélection du serveur.
-- **`pinoteaux.projetrioc.gamepart`** : Contient la logique du jeu Simon et ses contrôleurs associés.
+- **`pinoteaux.projetrioc.gamepart`** : Contient la logique du jeu et ses contrôleurs associés.
 
 ### Ressources FXML
 - `connexion.fxml`
@@ -64,7 +64,7 @@ Le programme inclut un système de chat qui permet aux joueurs de communiquer en
 - **Main.java** : Point d’entrée principal.
 - **Controller classes** : Contrôleurs pour chaque vue FXML.
 - **ChatHandler.java** : Gestionnaire pour la logique de communication du chat.
-- **Simon.java** et **Chrono.java** : Logique du jeu Simon et gestion du chronomètre.
+- **ColorMemory.java** et **Chrono.java** : Logique du jeu et gestion du chronomètre.
 
 ---
 
@@ -161,5 +161,6 @@ help:
 
 ## Fonctionnalités à implémenter
 - Ajout de la fonctionnalité "Classement" dans le menu principal.
-- Gestion améliorée des erreurs côté serveur.
-- Tests unitaires pour les classes principales.
+- Gestion améliorée des erreurs côté serveur et client.
+- Augmentation de la difficulté au fil des séquences en partie solo.
+- Authentification des joueurs avec mot de passe et stockage des meilleures performances.
