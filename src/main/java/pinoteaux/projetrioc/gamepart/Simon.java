@@ -152,16 +152,6 @@ public class Simon {
         javafx.application.Platform.runLater(this::displaySequence);
     }
 
-    // Méthode main pour démarrer l'application
-    public static void main(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Simon.class.getResource("simon.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 600, 600);
-        stage.setTitle("Color Memory");
-        stage.setResizable(false);
-        stage.setScene(scene);
-        stage.show();
-    }
-
     public void stopGame() {
         this.controller.stopSimon();
         //sendResult(this.username);
