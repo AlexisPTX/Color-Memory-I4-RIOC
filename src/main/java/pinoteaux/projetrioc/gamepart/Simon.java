@@ -25,12 +25,12 @@ public class Simon {
     private List<Integer> randomIntegers = new ArrayList<>();
     private String username;
 
-    public Simon(ControllerSimon controller, Socket socket, Chrono chrono, String username) {
+    public Simon(ControllerSimon controller, Chrono chrono, String username) {
         this.controller = controller;
-        this.socket = socket;
         chrono.startChrono();
         initList();
         this.username = username;
+        this.socket = null;
     }
     public Simon(ControllerSimon controller, Socket socket, Chrono chrono, int firstInt, String username) {
         this.controller = controller;

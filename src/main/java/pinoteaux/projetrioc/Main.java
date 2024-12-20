@@ -93,7 +93,7 @@ public class Main extends Application {
         Chrono chrono = new Chrono(1,controllerJeu);
         Simon simon;
         if(firstInt == 0) {
-            simon = new Simon(controllerJeu, socketServ, chrono, this.username);
+            simon = new Simon(controllerJeu, chrono, this.username);
         }else{
             simon = new Simon(controllerJeu, socketServ, chrono, firstInt, this.username);
         }
