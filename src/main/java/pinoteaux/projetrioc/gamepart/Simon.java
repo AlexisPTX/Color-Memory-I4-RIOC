@@ -112,7 +112,6 @@ public class Simon {
                             }
                             if (response.has("sequenceActual")) {
                                 this.sequenceActual = response.get("sequenceActual").getAsInt();
-                                System.out.println("Sequence actual : " + this.sequenceActual);
                             }
                             if (response.has("randomIntegers")) {
                                 JsonArray jsonArray = response.getAsJsonArray("randomIntegers");
