@@ -8,7 +8,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Classe Chrono gérant un chronomètre en secondes pour un jeu Simon.
+ * Classe Chrono gérant un chronomètre en secondes pour une partie de jeu de Color Memory.
  * Cette classe utilise une instance de {@link Timeline} pour déclencher des actions à intervalles réguliers
  * et met à jour l'affichage du temps restant via un contrôleur.
  */
@@ -20,7 +20,7 @@ public class Chrono {
     private int timeInSeconds;
 
     /**
-     * Formatteur pour afficher le temps au format "mm:ss".
+     * Formateur pour afficher le temps au format "mm:ss".
      */
     private final DateTimeFormatter timeFormatter;
 
@@ -32,20 +32,20 @@ public class Chrono {
     /**
      * Contrôleur permettant de mettre à jour l'affichage du temps.
      */
-    private final ControllerSimon controller;
+    private final ControllerColorMemory controller;
 
     /**
-     * Instance du jeu Simon associée au chronomètre.
+     * Instance du jeu associée au chronomètre.
      */
-    private Simon simon;
+    private ColorMemory colorMemory;
 
     /**
      * Constructeur de la classe Chrono.
      *
      * @param minutes   Nombre de minutes pour initialiser le chronomètre (converti en secondes).
-     * @param controller Instance de {@link ControllerSimon} pour mettre à jour l'affichage du temps.
+     * @param controller Instance de {@link ControllerColorMemory} pour mettre à jour l'affichage du temps.
      */
-    public Chrono(int minutes, ControllerSimon controller) {
+    public Chrono(int minutes, ControllerColorMemory controller) {
         this.controller = controller;
         this.timeInSeconds = minutes * 30; // Nombre de secondes initiales (erreur potentielle ici, vérifier si *30 est intentionnel)
         this.timeFormatter = DateTimeFormatter.ofPattern("mm:ss");
@@ -53,12 +53,12 @@ public class Chrono {
     }
 
     /**
-     * Définit l'instance du jeu Simon associée au chronomètre.
+     * Définit l'instance du jeu associée au chronomètre.
      *
-     * @param simon Instance de {@link Simon}.
+     * @param colorMemory Instance de {@link ColorMemory}.
      */
-    public void setSimon(Simon simon) {
-        this.simon = simon;
+    public void setColorMemory(ColorMemory colorMemory) {
+        this.colorMemory = colorMemory;
     }
 
     /**
@@ -77,8 +77,8 @@ public class Chrono {
 
             if (timeInSeconds <= 0) {
                 timeline.stop();
-                if (simon != null) {
-                    simon.stopGame();
+                if (colorMemory != null) {
+                    colorMemory.stopGame();
                 }
             }
         }));
@@ -87,7 +87,7 @@ public class Chrono {
     }
 
     /**
-     * Formatte le temps restant en une chaîne de caractères au format "mm:ss".
+     * Formate le temps restant en une chaîne de caractères au format "mm:ss".
      *
      * @param seconds Nombre de secondes à formater.
      * @return Temps formaté en chaîne de caractères.

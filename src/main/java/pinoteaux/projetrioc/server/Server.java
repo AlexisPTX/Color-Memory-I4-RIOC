@@ -20,13 +20,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Server {
 
     /**
-     * Les ports utilisés pour les serveurs. Le premier est global, et les suivants sont spécifiques aux serveurs.
+     * Les ports utilisés pour les serveurs. Le premier est global, et les suivants sont spécifiques aux serveurs de jeu.
      */
     private static final int[] PORTS = {Constantes.SERVER_GLOBAL_PORT, Constantes.SERVER_1_PORT,
             Constantes.SERVER_2_PORT, Constantes.SERVER_3_PORT, Constantes.SERVER_4_PORT, Constantes.SERVER_5_PORT};
 
     /**
-     * Liste contenant les entiers aléatoires utilisés dans le jeu.
+     * Liste contenant les entiers aléatoires correspondant aux couleurs utilisés dans le jeu.
      */
     private static final List<Integer> randomIntegers = new ArrayList<>();
 
@@ -57,10 +57,10 @@ public class Server {
     }
 
     /**
-     * Gère les connexions des clients pour chaque serveur. Accepte les connexions et initialise un jeu lorsqu'un
+     * Gère les connexions des clients pour chaque serveur. Accepte les connexions et initialise un jeu lorsque le
      * nombre maximum d'utilisateurs est atteint.
      *
-     * @param serverSocket La socket du serveur pour accepter les connexions des clients.
+     * @param serverSocket Le socket du serveur pour accepter les connexions des clients.
      * @param serverNumber Le numéro du serveur en cours.
      * @param maxUsers Le nombre maximum d'utilisateurs autorisés par serveur avant de démarrer un jeu.
      */

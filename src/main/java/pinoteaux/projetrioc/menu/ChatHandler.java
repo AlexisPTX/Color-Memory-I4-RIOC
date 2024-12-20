@@ -118,7 +118,7 @@ public class ChatHandler implements Runnable {
                                         String messageServ = messageJson.get("message").getAsString();
                                         if (messageServ.equals("START")) {
                                             Platform.runLater(() -> {
-                                                mainApp.startSimonGame(intDebut);
+                                                mainApp.startColorMemoryGame(intDebut);
                                             });
                                             break;
                                         }

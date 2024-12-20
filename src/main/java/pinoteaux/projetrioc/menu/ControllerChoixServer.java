@@ -68,10 +68,9 @@ public class ControllerChoixServer {
      * Établit une connexion avec un serveur en fonction du port spécifié
      * et masque le groupe de boutons après une connexion réussie.
      *
-     * @param e    L'événement déclenché par l'utilisateur (non utilisé directement ici).
      * @param port Le port du serveur auquel se connecter.
      */
-    private void connectToServer(ActionEvent e, int port) {
+    private void connectToServer(int port) {
         Socket socket = null;
         try {
             socket = new Socket(Constantes.SERVER_ADDRESS, port);
@@ -85,47 +84,37 @@ public class ControllerChoixServer {
 
     /**
      * Gère l'action du bouton de connexion au serveur 1.
-     *
-     * @param e L'événement déclenché par l'utilisateur.
      */
-    public void actionButtonServer1(ActionEvent e) {
-        connectToServer(e, Constantes.SERVER_1_PORT);
+    public void actionButtonServer1() {
+        connectToServer(Constantes.SERVER_1_PORT);
     }
 
     /**
      * Gère l'action du bouton de connexion au serveur 2.
-     *
-     * @param e L'événement déclenché par l'utilisateur.
      */
-    public void actionButtonServer2(ActionEvent e) {
-        connectToServer(e, Constantes.SERVER_2_PORT);
+    public void actionButtonServer2() {
+        connectToServer(Constantes.SERVER_2_PORT);
     }
 
     /**
      * Gère l'action du bouton de connexion au serveur 3.
-     *
-     * @param e L'événement déclenché par l'utilisateur.
      */
-    public void actionButtonServer3(ActionEvent e) {
-        connectToServer(e, Constantes.SERVER_3_PORT);
+    public void actionButtonServer3() {
+        connectToServer(Constantes.SERVER_3_PORT);
     }
 
     /**
      * Gère l'action du bouton de connexion au serveur 4.
-     *
-     * @param e L'événement déclenché par l'utilisateur.
      */
-    public void actionButtonServer4(ActionEvent e) {
-        connectToServer(e, Constantes.SERVER_4_PORT);
+    public void actionButtonServer4() {
+        connectToServer(Constantes.SERVER_4_PORT);
     }
 
     /**
      * Gère l'action du bouton de connexion au serveur 5.
-     *
-     * @param e L'événement déclenché par l'utilisateur.
      */
-    public void actionButtonServer5(ActionEvent e) {
-        connectToServer(e, Constantes.SERVER_5_PORT);
+    public void actionButtonServer5() {
+        connectToServer(Constantes.SERVER_5_PORT);
     }
 
     /**

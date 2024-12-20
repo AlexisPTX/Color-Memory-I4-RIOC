@@ -11,10 +11,10 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 /**
- * Classe contrôleur pour le jeu Simon.
+ * Classe contrôleur pour le jeu.
  * Gère l'interaction utilisateur, l'affichage des séquences, le chronomètre et les actions liées aux boutons de couleur.
  */
-public class ControllerSimon {
+public class ControllerColorMemory {
 
     /**
      * Chemin SVG pour la section rouge.
@@ -59,7 +59,7 @@ public class ControllerSimon {
     private Text messageSequence;
 
     /**
-     * Groupe de fin de jeu (affiché à la fin d'une partie).
+     * Groupe de fin de jeu (affiché à la fin d'une partie). Affichage de GAME OVER à l'écran.
      */
     @FXML
     private Group finGroup;
@@ -71,24 +71,24 @@ public class ControllerSimon {
     private Group jeuGroup;
 
     /**
-     * Instance du jeu Simon associée à ce contrôleur.
+     * Instance du jeu associée à ce contrôleur.
      */
-    private Simon simon;
+    private ColorMemory colorMemory;
 
     /**
-     * Définit l'instance du jeu Simon pour ce contrôleur.
+     * Définit l'instance du pour ce contrôleur.
      *
-     * @param simon Instance de {@link Simon}.
+     * @param colorMemory Instance de {@link ColorMemory}.
      */
-    public void setSimon(Simon simon) {
-        this.simon = simon;
+    public void setColorMemory(ColorMemory colorMemory) {
+        this.colorMemory = colorMemory;
         this.finGroup.setVisible(false);
     }
 
     /**
-     * Arrête le jeu Simon, rend l'interface non interactive et affiche l'écran de fin.
+     * Arrête la partie, rend l'interface non interactive et affiche l'écran de fin.
      */
-    public void stopSimon() {
+    public void stopColorMemory() {
         this.jeuGroup.setMouseTransparent(true);
         this.finGroup.setVisible(true);
     }
@@ -149,7 +149,7 @@ public class ControllerSimon {
 
         timeline.getKeyFrames().addAll(brightFrame, darkFrame, delayFrame);
         timeline.setOnFinished(event -> {
-            this.simon.checkAnswer(colorIndex);
+            this.colorMemory.checkAnswer(colorIndex);
             enableShape();
         });
         timeline.play();

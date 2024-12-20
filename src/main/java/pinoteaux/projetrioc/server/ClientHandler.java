@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * La classe ClientHandler gère les interactions entre un client et le serveur.
- * Elle gère la communication via des messages JSON pour la gestion des chat et des réponses dans un jeu de Simon.
+ * Elle gère la communication via des messages JSON pour la gestion des chats et des réponses dans une partie de jeu.
  */
 public class ClientHandler implements Runnable {
 
@@ -30,7 +30,7 @@ public class ClientHandler implements Runnable {
     private final int serverNumber;
 
     /**
-     * La liste des entiers aléatoires représentant la séquence de Simon.
+     * La liste des entiers aléatoires représentant la séquence de couleurs.
      */
     private final List<Integer> randomIntegers;
 
@@ -61,11 +61,11 @@ public class ClientHandler implements Runnable {
     private final CopyOnWriteArrayList<Socket> listClients;
 
     /**
-     * Constructeur de la classe ClientHandler avec une séquence de Simon fournie.
+     * Constructeur de la classe ClientHandler avec une séquence de couleurs fournie.
      *
      * @param socket          La socket du client.
      * @param serverNumber    Le numéro du serveur auquel le client est connecté.
-     * @param randomIntegers  La liste des entiers aléatoires représentant la séquence de Simon.
+     * @param randomIntegers  La liste des entiers aléatoires représentant la séquence des couleurs.
      * @param connectedClients La liste des clients connectés au serveur.
      */
     public ClientHandler(Socket socket, int serverNumber, List<Integer> randomIntegers, CopyOnWriteArrayList<Socket> connectedClients) {
@@ -82,7 +82,7 @@ public class ClientHandler implements Runnable {
     }
 
     /**
-     * Constructeur de la classe ClientHandler sans séquence de Simon fournie.
+     * Constructeur de la classe ClientHandler sans séquence de couleurs fournie.
      *
      * @param socket          La socket du client.
      * @param serverNumber    Le numéro du serveur auquel le client est connecté.
@@ -141,9 +141,8 @@ public class ClientHandler implements Runnable {
      *
      * @param json Le message JSON reçu du client.
      * @param gson L'instance Gson pour sérialiser et désérialiser les objets JSON.
-     * @throws IOException Si une erreur survient lors de l'envoi des messages aux autres clients.
      */
-    private void handleChatMessage(JsonObject json, Gson gson) throws IOException {
+    private void handleChatMessage(JsonObject json, Gson gson) {
         if (json.has("message") && json.has("pseudo")) {
             String message = json.get("message").getAsString();
             String pseudo = json.get("pseudo").getAsString();
@@ -154,19 +153,24 @@ public class ClientHandler implements Runnable {
 
             for (Socket otherSocket : listClients) {
                 if (!otherSocket.equals(this.socket)) {
-                    PrintWriter pw = new PrintWriter(otherSocket.getOutputStream());
-                    pw.println(gson.toJson(json));
-                    pw.flush();
+                    PrintWriter pwOthers = null;
+                    try {
+                        pwOthers = new PrintWriter(otherSocket.getOutputStream());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    pwOthers.println(gson.toJson(json));
+                    pwOthers.flush();
                 }
             }
         }
     }
 
     /**
-     * Gère la réponse d'un joueur à une séquence de Simon.
-     * Cette méthode valide la réponse et met à jour l'état du jeu en fonction de la réponse.
+     * Gère la couleur cliquée par le joueur.
+     * Cette méthode vérifie la réponse et met à jour l'état du jeu en fonction de la réponse.
      *
-     * @param userAnswer La réponse de l'utilisateur au tour de Simon.
+     * @param userAnswer La réponse de l'utilisateur, la couleur qu'il a cliqué.
      */
     private void handleUserAnswer(int userAnswer) {
         Gson gson = new Gson();
@@ -193,7 +197,7 @@ public class ClientHandler implements Runnable {
 
     /**
      * Crée une réponse au client sous forme d'un objet JSON.
-     * Cette réponse peut contenir des informations comme la séquence actuelle et les indices du joueur.
+     * Cette réponse peut contenir des informations comme la séquence actuelle et les indices de la séquence du joueur.
      *
      * @param message Le message à envoyer au client (par exemple, "VALID", "RESET", "SUIVANT").
      * @return L'objet JSON contenant la réponse à envoyer.
@@ -201,7 +205,6 @@ public class ClientHandler implements Runnable {
     private JsonObject createResponse(String message) {
         JsonObject response = new JsonObject();
 
-        // Si ce n'est pas un message "VALID", on ajoute des informations sur la séquence et l'état actuel
         if (!message.equals("VALID")) {
             response.addProperty("sequenceActual", this.sequenceActual);
             response.addProperty("currentPlayerIndex", this.currentPlayerIndex);

@@ -7,8 +7,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import pinoteaux.projetrioc.gamepart.Chrono;
-import pinoteaux.projetrioc.gamepart.ControllerSimon;
-import pinoteaux.projetrioc.gamepart.Simon;
+import pinoteaux.projetrioc.gamepart.ControllerColorMemory;
+import pinoteaux.projetrioc.gamepart.ColorMemory;
 import pinoteaux.projetrioc.menu.*;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ import static javafx.application.Platform.exit;
 /**
  * La classe Main est l'application principale qui gère l'interface graphique et les interactions avec les utilisateurs.
  * Elle est responsable du démarrage des différents écrans de l'application, tels que la connexion, le menu principal,
- * le jeu Simon, et le chat.
+ * le jeu, et le chat.
  */
 public class Main extends Application {
 
@@ -65,7 +65,7 @@ public class Main extends Application {
     }
 
     /**
-     * Démarre l'écran principal de l'application après qu'un nom d'utilisateur ait été saisi.
+     * Démarre l'écran principal de l'application après qu'un nom d'utilisateur a été saisi.
      * Affiche le menu principal avec le chat.
      *
      * @param username Le nom d'utilisateur choisi par l'utilisateur.
@@ -94,41 +94,41 @@ public class Main extends Application {
     }
 
     /**
-     * Lance le jeu Simon en initialisant les composants nécessaires et en démarrant le jeu.
+     * Lance le jeu en initialisant les composants nécessaires et en démarrant le jeu.
      *
-     * @param firstInt Si ce paramètre est 0, un nouveau jeu commence sans serveur; sinon, il représente
-     *                 un identifiant pour un jeu en réseau.
+     * @param firstInt Si ce paramètre est 0, une partie hors ligne commence ; sinon, il représente
+     *                 la première couleur pour un jeu en réseau.
      */
-    public void startSimonGame(int firstInt) {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("gamepart/simon.fxml"));
+    public void startColorMemoryGame(int firstInt) {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("gamepart/colorMemory.fxml"));
         Parent root = null;
         try {
             root = fxmlLoader.load();
         } catch (IOException e) {
-            System.out.println("Error in Main loading simon.fxml : " + e.getMessage());
+            System.out.println("Error in Main loading colorMemory.fxml : " + e.getMessage());
         }
 
-        // Obtenez le contrôleur de Simon et configurez-le
-        ControllerSimon controllerJeu = fxmlLoader.getController();
+        // Obtenez le contrôleur de Color Memory et configurez-le
+        ControllerColorMemory controllerJeu = fxmlLoader.getController();
         Chrono chrono = new Chrono(1,controllerJeu);
-        Simon simon;
+        ColorMemory colorMemory;
         if(firstInt == 0) {
-            simon = new Simon(controllerJeu, chrono, this.username);
+            colorMemory = new ColorMemory(controllerJeu, chrono, this.username);
         }else{
-            simon = new Simon(controllerJeu, socketServ, chrono, firstInt, this.username);
+            colorMemory = new ColorMemory(controllerJeu, socketServ, chrono, firstInt, this.username);
         }
-        controllerJeu.setSimon(simon);
-        chrono.setSimon(simon);
+        controllerJeu.setColorMemory(colorMemory);
+        chrono.setColorMemory(colorMemory);
 
-        // Créez la scène pour Simon
+        // Créez la scène pour le jeu
         Scene scene = new Scene(root, 800, 600);
         actualStage.setTitle("Color Memory");
         actualStage.setResizable(false);
         actualStage.setScene(scene);
         actualStage.show();
 
-        // Démarrez le jeu Simon
-        simon.startGame();
+        // Démarrez le jeu
+        colorMemory.startGame();
     }
 
     /**
@@ -156,7 +156,7 @@ public class Main extends Application {
     }
 
     /**
-     * Gère la réception d'un nouveau socket pour un serveur, et met à jour l'interface en fonction de l'état actuel du tournoi.
+     * Gère la réception d'un nouveau socket pour un serveur, et met à jour l'interface dans l'attente du début du tournoi.
      *
      * @param socketServ Le socket du serveur auquel se connecter.
      */
@@ -253,15 +253,6 @@ public class Main extends Application {
 
         // Démarre le ChatHandler dans un thread séparé
         new Thread(this.chatHandler).start();
-    }
-
-    /**
-     * Récupère le stage actuel de l'application.
-     *
-     * @return Le stage actuel de l'application.
-     */
-    public Stage getStage(){
-        return this.actualStage;
     }
 
     /**

@@ -17,16 +17,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * La classe Simon représente la logique du jeu Simon, avec prise en charge
+ * La classe ColorMemory représente la logique du jeu, avec prise en charge
  * des modes hors ligne et en réseau. Elle gère les séquences, les réponses des joueurs,
  * et les interactions avec le contrôleur d'interface graphique.
  */
-public class Simon {
+public class ColorMemory {
 
     /**
      * Référence au contrôleur pour mettre à jour l'interface utilisateur.
      */
-    private final ControllerSimon controller;
+    private final ControllerColorMemory controller;
 
     /**
      * Socket utilisé pour la communication réseau. Null si le mode est hors ligne.
@@ -54,13 +54,13 @@ public class Simon {
     private String username;
 
     /**
-     * Constructeur pour un jeu Simon hors ligne.
+     * Constructeur pour une partie de jeu hors ligne.
      *
      * @param controller Référence au contrôleur pour gérer l'interface utilisateur.
      * @param chrono      Référence à un chronomètre pour suivre le temps.
      * @param username    Nom d'utilisateur du joueur.
      */
-    public Simon(ControllerSimon controller, Chrono chrono, String username) {
+    public ColorMemory(ControllerColorMemory controller, Chrono chrono, String username) {
         this.controller = controller;
         chrono.startChrono();
         initList();
@@ -69,7 +69,7 @@ public class Simon {
     }
 
     /**
-     * Constructeur pour un jeu Simon en mode réseau.
+     * Constructeur pour une partie de jeu en mode réseau.
      *
      * @param controller Référence au contrôleur pour gérer l'interface utilisateur.
      * @param socket     Socket pour la communication réseau.
@@ -77,7 +77,7 @@ public class Simon {
      * @param firstInt   Premier entier de la séquence (généré par le serveur).
      * @param username   Nom d'utilisateur du joueur.
      */
-    public Simon(ControllerSimon controller, Socket socket, Chrono chrono, int firstInt, String username) {
+    public ColorMemory(ControllerColorMemory controller, Socket socket, Chrono chrono, int firstInt, String username) {
         this.controller = controller;
         this.socket = socket;
         chrono.startChrono();
@@ -86,7 +86,9 @@ public class Simon {
     }
 
     /**
-     * Initialise la liste des séquences aléatoires avec 100 entiers compris entre 1 et 4.
+     * Initialise la liste des séquences aléatoires avec 100 entiers
+     * compris entre 1 et 4 pour une partie hors ligne.
+     * (1 = vert, 2 = bleu, 3 = jaune, 4 = rouge)
      */
     private void initList() {
         for (int i = 0; i < 100; i++) {
@@ -119,7 +121,7 @@ public class Simon {
     }
 
     /**
-     * Vérifie si la réponse donnée par le joueur est correcte.
+     * Vérifie si la réponse donnée par le joueur est correcte, pour une partie hors ligne.
      *
      * @param userAnswer La réponse donnée par le joueur (numéro de la forme cliquée).
      */
@@ -183,14 +185,14 @@ public class Simon {
                                 break;
                             }
                         } else {
-                            System.err.println("[Simon] - Invalid JSON received: " + responseJson);
+                            System.err.println("[Color Memory] - Invalid JSON received: " + responseJson);
                         }
                     } else {
-                        System.err.println("[Simon] - Blank line received from server.");
+                        System.err.println("[Color Memory] - Blank line received from server.");
                     }
                 }
             } catch (IOException e) {
-                System.out.println("[Simon] - Failed to checkAnswer : " + e.getMessage());
+                System.out.println("[Color Memory] - Failed to checkAnswer : " + e.getMessage());
             }
         }
     }
@@ -208,6 +210,6 @@ public class Simon {
      * Arrête le jeu et notifie le contrôleur.
      */
     public void stopGame() {
-        this.controller.stopSimon();
+        this.controller.stopColorMemory();
     }
 }

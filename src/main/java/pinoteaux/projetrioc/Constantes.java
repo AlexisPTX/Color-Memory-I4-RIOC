@@ -12,7 +12,7 @@ public class Constantes {
     public static final String SERVER_ADDRESS = "localhost";
 
     /**
-     * Le port global du serveur utilisé pour les connexions générales.
+     * Le port global du serveur utilisé pour les connexions générales et la discussion globale.
      */
     public static final int SERVER_GLOBAL_PORT = 9999;
 

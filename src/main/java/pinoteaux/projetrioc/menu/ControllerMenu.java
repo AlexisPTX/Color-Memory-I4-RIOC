@@ -36,23 +36,19 @@ public class ControllerMenu {
 
     /**
      * Gère l'action du bouton "Solo".
-     * Lance une partie en mode solo avec un identifiant de partie par défaut (0).
-     *
-     * @param e L'événement déclenché par l'utilisateur.
+     * Lance une partie en mode hors ligne.
      */
-    public void actionSoloButton(ActionEvent e) {
+    public void actionSoloButton() {
         if (mainApp != null) {
-            mainApp.startSimonGame(0); // Démarre une partie en mode solo
+            mainApp.startColorMemoryGame(0); // Démarre une partie en mode solo
         }
     }
 
     /**
      * Gère l'action du bouton "Tournoi".
      * Redirige l'utilisateur vers l'écran de sélection du serveur pour le mode tournoi.
-     *
-     * @param e L'événement déclenché par l'utilisateur.
      */
-    public void actionTournoisButton(ActionEvent e) {
+    public void actionTournoisButton() {
         if (mainApp != null) {
             mainApp.startChoixServer(); // Accède à la sélection du serveur pour le tournoi
         }
@@ -61,10 +57,8 @@ public class ControllerMenu {
     /**
      * Gère l'action du bouton "Classement".
      * Redirige l'utilisateur vers l'écran affichant le classement des joueurs.
-     *
-     * @param e L'événement déclenché par l'utilisateur.
      */
-    public void actionClassementButton(ActionEvent e) {
+    public void actionClassementButton() {
         /*
         if (mainApp != null) {
             mainApp.startClassement(); // Affiche le classement des joueurs

@@ -1,93 +1,165 @@
-# PINOTEAUX-Color-Memory
+# Documentation du Projet Color Memory
 
+## Introduction
+Ce programme est une application JavaFX qui permet de jouer au jeu de mémoire de couleur tout en offrant une fonctionnalité de chat entre joueurs. Le projet est organisé en plusieurs modules : connexion, menu principal, jeu et gestion du chat. Il inclut une logique de communication entre clients via un serveur socket.
 
+---
 
-## Getting started
+## Fonctionnalités principales
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+### 1. Connexion
+L'utilisateur démarre par un écran de connexion où il choisit son pseudonyme.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- **FXML utilisé** : `connexion.fxml`
+- **Contrôleur** : `ControllerConnexion`
+- **Action principale** : Enregistrer le pseudonyme et lancer le menu principal.
 
-## Add your files
+### 2. Menu principal
+Une fois connecté, l'utilisateur accède à un menu principal qui propose plusieurs options :
+- Jouer au jeu (en mode solo ou en mode tournois).
+- Voir le classement (fonctionnalité à implémenter).
+- Choisir un serveur pour participer à un tournoi.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+- **FXML utilisé** : `menu.fxml`
+- **Contrôleur** : `ControllerMenu`
 
+### 3. Jeu Color Memory
+Le jeu teste la mémoire de l'utilisateur en lui demandant de répéter une séquence de couleurs dans le bon ordre. Le mode de jeu peut varier selon que l'utilisateur joue en solo ou en tournoi.
+
+- **FXML utilisé** : `colorMemory.fxml`
+- **Contrôleur** : `ControllerSimon`
+- **Classes principales** :
+    - `Simon` : Contient la logique du jeu.
+    - `Chrono` : Gestion du chronomètre.
+
+#### Fonctionnalités du jeu
+- Mode solo : La séquence de couleurs est générée localement.
+- Mode tournoi : La séquence est synchronisée avec les autres joueurs via le serveur.
+
+### 4. Chat
+Le programme inclut un système de chat qui permet aux joueurs de communiquer entre eux.
+
+- **FXML utilisé** : `chat.fxml`
+- **Contrôleur** : `ControllerChat`
+- **Classe associée** : `ChatHandler`
+- **Sockets** : Les communications passent par un serveur socket.
+
+---
+
+## Organisation du projet
+
+### Structure des packages
+- **`pinoteaux.projetrioc`** : Point d’entrée du programme.
+- **`pinoteaux.projetrioc.menu`** : Gère la connexion, le menu principal et la sélection du serveur.
+- **`pinoteaux.projetrioc.gamepart`** : Contient la logique du jeu Simon et ses contrôleurs associés.
+
+### Ressources FXML
+- `connexion.fxml`
+- `menu.fxml`
+- `choixServer.fxml`
+- `colorMemory.fxml`
+- `chat.fxml`
+
+### Fichiers Java
+- **Main.java** : Point d’entrée principal.
+- **Controller classes** : Contrôleurs pour chaque vue FXML.
+- **ChatHandler.java** : Gestionnaire pour la logique de communication du chat.
+- **Simon.java** et **Chrono.java** : Logique du jeu Simon et gestion du chronomètre.
+
+---
+
+## Ressources nécessaires
+
+### Environnement de développement
+- **Java JDK 17 ou version ultérieure**
+- **JavaFX SDK** (configuré dans le chemin de compilation)
+- **Un serveur socket fonctionnel** (adresse et ports configurables dans `Constantes.java`)
+- **IDE** comme IntelliJ IDEA ou Eclipse pour une meilleure gestion du projet.
+
+### Bibliothèques externes
+- Aucune bibliothèque externe n’est nécessaire.
+
+---
+
+## Instructions pour l’exécution
+
+1. **Configurer le serveur socket** : Assurez-vous que le serveur défini par `Constantes.SERVER_ADDRESS` et `Constantes.SERVER_GLOBAL_PORT` est actif.
+2. **Compiler et exécuter** :
+    - Via un IDE : Importez le projet et exécutez la classe `Main` pour démarrer un client et la classe `Server` pour le serveur.
+    - Via la ligne de commande : Utilisez le Makefile ci-dessous.
+
+---
+
+## Makefile
+
+Voici un Makefile pour automatiser la compilation et l’exécution :
+
+```makefile
+# Variables
+SRC_DIR = src
+BIN_DIR = bin
+MAIN_CLASS = pinoteaux.projetrioc.Main
+SERVER_CLASS = pinoteaux.projetrioc.server.Server
+JAVAC = javac
+JAVA = java
+FLAGS = -d $(BIN_DIR) -classpath $(BIN_DIR):$(SRC_DIR)
+
+# JavaFX Configuration
+# Remplacez le chemin ci-dessous par celui de votre SDK JavaFX
+JAVAFX_PATH = /path/to/javafx-sdk-XX/lib
+JAVAFX_FLAGS = --module-path $(JAVAFX_PATH) --add-modules javafx.controls,javafx.fxml
+
+# Compilation
+all: compile
+
+compile:
+	@echo "Compilation des fichiers Java avec JavaFX..."
+	mkdir -p $(BIN_DIR)
+	$(JAVAC) $(FLAGS) --module-path $(JAVAFX_PATH) --add-modules javafx.controls,javafx.fxml $(SRC_DIR)/pinoteaux/projetrioc/**/*.java
+	@echo "Compilation terminée."
+
+# Lancement du serveur
+run-server:
+	@echo "Lancement du serveur..."
+	$(JAVA) -classpath $(BIN_DIR) $(SERVER_CLASS)
+
+# Lancement d'un client
+run-client:
+	@echo "Lancement d'un client avec JavaFX..."
+	$(JAVA) -classpath $(BIN_DIR) $(JAVAFX_FLAGS) $(MAIN_CLASS)
+
+# Lancement de plusieurs clients
+run-multi-client:
+	@echo "Lancement de plusieurs clients..."
+	for i in 1 2 3; do \
+		$(JAVA) -classpath $(BIN_DIR) $(JAVAFX_FLAGS) $(MAIN_CLASS) & \
+	done
+
+# Nettoyage
+clean:
+	@echo "Nettoyage des fichiers compilés..."
+	rm -rf $(BIN_DIR)/*
+	@echo "Nettoyage terminé."
+
+# Aide
+help:
+	@echo "Commandes disponibles :"
+	@echo "  make all           : Compile le projet avec JavaFX."
+	@echo "  make run-server    : Lance le serveur."
+	@echo "  make run-client    : Lance un client avec JavaFX."
+	@echo "  make run-multi-client : Lance plusieurs clients avec JavaFX (par défaut 3)."
+	@echo "  make clean         : Supprime les fichiers compilés."
 ```
-cd existing_repo
-git remote add origin https://gitlab.rioc.lab/i4-fise-rioc/pinoteaux-color-memory.git
-git branch -M main
-git push -uf origin main
-```
 
-## Integrate with your tools
+---
 
-- [ ] [Set up project integrations](https://gitlab.rioc.lab/i4-fise-rioc/pinoteaux-color-memory/-/settings/integrations)
+## Notes complémentaires
+- Les fichiers FXML doivent être placés dans le répertoire `resources` pour que `FXMLLoader` puisse les charger correctement.
+- Si des erreurs surviennent, vérifiez que le chemin du module JavaFX est correctement configuré dans le Makefile ou l'IDE.
 
-## Collaborate with your team
+---
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Fonctionnalités à implémenter
+- Ajout de la fonctionnalité "Classement" dans le menu principal.
+- Gestion améliorée des erreurs côté serveur.
+- Tests unitaires pour les classes principales.
