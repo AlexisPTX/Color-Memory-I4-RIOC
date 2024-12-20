@@ -6,6 +6,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import pinoteaux.projetrioc.Constantes;
 import pinoteaux.projetrioc.Main;
 
 import java.io.IOException;
@@ -34,9 +35,7 @@ public class ControllerChoixServer {
     private void connectToServer(ActionEvent e, int port) {
         Socket socket = null;
         try {
-            System.out.println("Attempting to connect to server on port: " + port);
-            socket = new Socket("localhost", port);
-            System.out.println("Connected to server on port: " + port);
+            socket = new Socket(Constantes.SERVER_ADDRESS, port);
         } catch(IOException ex){
             System.out.println("Error in creating socket: " + ex.getMessage());
             return; // Exit if socket creation failed
@@ -46,23 +45,23 @@ public class ControllerChoixServer {
     }
 
     public void actionButtonServer1(ActionEvent e) {
-        connectToServer(e, 1111);
+        connectToServer(e, Constantes.SERVER_1_PORT);
     }
 
     public void actionButtonServer2(ActionEvent e) {
-        connectToServer(e, 2222);
+        connectToServer(e, Constantes.SERVER_2_PORT);
     }
 
     public void actionButtonServer3(ActionEvent e) {
-        connectToServer(e, 3333);
+        connectToServer(e, Constantes.SERVER_3_PORT);
     }
 
     public void actionButtonServer4(ActionEvent e) {
-        connectToServer(e, 4444);
+        connectToServer(e, Constantes.SERVER_4_PORT);
     }
 
     public void actionButtonServer5(ActionEvent e) {
-        connectToServer(e, 5555);
+        connectToServer(e, Constantes.SERVER_5_PORT);
     }
 
     public void setMainApp(Main mainApp) {

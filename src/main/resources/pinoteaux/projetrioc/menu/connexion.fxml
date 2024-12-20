@@ -22,7 +22,7 @@
                   <Font size="48.0" />
                </font>
             </Text>
-            <TextField fx:id="usernameField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="300.0" promptText="Pseudo">
+            <TextField fx:id="usernameField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="80.0" prefWidth="300.0" promptText="Pseudo">
                <font>
                   <Font size="36.0" />
                </font>

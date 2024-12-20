@@ -21,8 +21,7 @@ public class ChatHandler implements Runnable {
         try {
             this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             this.out = new PrintWriter(this.socket.getOutputStream(), true);
-        } catch (IOException e) {
-            System.out.println("[ChatHandler] - Could not open");
+        } catch (IOException ignored) {
         }
     }
     public void setSocket(Socket socket) {
@@ -69,8 +68,6 @@ public class ChatHandler implements Runnable {
                                             Platform.runLater(() -> {
                                                 mainApp.startSimonGame(intDebut);
                                             });
-
-                                            System.out.println("[ChatHandler] - START game started");
                                             break;
                                         }
                                     }
@@ -79,8 +76,7 @@ public class ChatHandler implements Runnable {
                         }
                     }
                 }
-            } catch (IOException e) {
-                System.out.println("Error in ChatHandler: " + e.getMessage());
+            } catch (IOException ignored) {
             }
         }
     }

@@ -152,7 +152,6 @@ public class Main extends Application {
             controllerChat.setChatHandler(this.chatHandler, this.username);
             this.chatHandler.setMainApp(this);
         } catch (IOException e) {
-            System.out.println("Error loading chat.fxml: " + e.getMessage());
             return;
         }
 
@@ -181,14 +180,13 @@ public class Main extends Application {
                 ControllerChat controllerChat = chatLoader.getController();
 
                 // Crée le socket et démarre le ChatHandler
-                this.socketServ = new Socket("localhost", 9999); // Adresse/port du serveur
+                this.socketServ = new Socket(Constantes.SERVER_ADDRESS, Constantes.SERVER_GLOBAL_PORT); // Adresse/port du serveur
                 startChatHandler(this.socketServ, controllerChat);
 
                 // Passe le ChatHandler au contrôleur pour envoyer des messages
                 controllerChat.setChatHandler(this.chatHandler, this.username);
 
-            } catch (IOException e) {
-                System.out.println("Error loading chat.fxml: " + e.getMessage());
+            } catch (IOException ignored) {
             }
         }else if(affichage.equals("SERVER")){
             try {
@@ -198,8 +196,7 @@ public class Main extends Application {
                 chatHandler.setSocket(this.socketServ);
                 controllerChat.setChatHandler(this.chatHandler, this.username);
 
-            } catch (IOException e) {
-                System.out.println("Error loading chat.fxml: " + e.getMessage());
+            } catch (IOException ignored) {
             }
         }
 

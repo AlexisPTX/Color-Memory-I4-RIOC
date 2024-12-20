@@ -68,7 +68,6 @@ public class ClientHandler implements Runnable {
                                 json.addProperty("type", "CHAT");
                                 json.addProperty("message", message);
                                 json.addProperty("pseudo", pseudo);
-                                System.out.println(json);
                                 for(Socket otherSocket : listClients){
                                     if (!otherSocket.equals(this.socket)) {
                                         PrintWriter pw = new PrintWriter(otherSocket.getOutputStream());

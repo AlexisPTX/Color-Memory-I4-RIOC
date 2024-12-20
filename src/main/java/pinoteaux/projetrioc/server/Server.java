@@ -2,6 +2,7 @@ package pinoteaux.projetrioc.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import pinoteaux.projetrioc.Constantes;
 
 import java.io.*;
 import java.net.*;
@@ -13,7 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Server {
-    private static final int[] PORTS = {9999, 1111, 2222, 3333, 4444, 5555};
+    private static final int[] PORTS = {Constantes.SERVER_GLOBAL_PORT, Constantes.SERVER_1_PORT,
+            Constantes.SERVER_2_PORT, Constantes.SERVER_3_PORT, Constantes.SERVER_4_PORT, Constantes.SERVER_5_PORT};
     private static final List<Integer> randomIntegers = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
@@ -26,7 +28,7 @@ public class Server {
             if(i == 0){
                 new Thread(() -> handleClient(serverSocket, serverNumber,200)).start();
             } else {
-                new Thread(() -> handleClient(serverSocket, serverNumber, 2)).start();
+                new Thread(() -> handleClient(serverSocket, serverNumber, 3)).start();
             }
         }
     }
@@ -43,7 +45,7 @@ public class Server {
                     Socket socket = serverSocket.accept();
                     connectedClients.add(socket);
                     currentUsers.getAndIncrement();
-                    if(serverSocket.getLocalPort() != 9999){
+                    if(serverSocket.getLocalPort() != Constantes.SERVER_GLOBAL_PORT){
                         new Thread(new ClientHandler(socket, serverNumber, new ArrayList<>(randomIntegers), connectedClients)).start();
                         if (currentUsers.get() == maxUsers) {
                             for (Socket clientSocket : connectedClients) {
