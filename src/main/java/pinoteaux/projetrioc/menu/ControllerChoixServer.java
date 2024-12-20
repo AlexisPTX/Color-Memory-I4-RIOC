@@ -3,9 +3,7 @@ package pinoteaux.projetrioc.menu;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.stage.Stage;
 import pinoteaux.projetrioc.Constantes;
 import pinoteaux.projetrioc.Main;
 

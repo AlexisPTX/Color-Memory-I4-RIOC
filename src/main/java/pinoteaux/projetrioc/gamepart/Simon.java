@@ -5,9 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.BufferedReader;
@@ -16,7 +13,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
