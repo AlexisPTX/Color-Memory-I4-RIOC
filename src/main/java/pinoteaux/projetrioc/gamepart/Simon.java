@@ -16,15 +16,50 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * La classe Simon représente la logique du jeu Simon, avec prise en charge
+ * des modes hors ligne et en réseau. Elle gère les séquences, les réponses des joueurs,
+ * et les interactions avec le contrôleur d'interface graphique.
+ */
 public class Simon {
+
+    /**
+     * Référence au contrôleur pour mettre à jour l'interface utilisateur.
+     */
     private final ControllerSimon controller;
+
+    /**
+     * Socket utilisé pour la communication réseau. Null si le mode est hors ligne.
+     */
     final Socket socket;
 
+    /**
+     * Indique la séquence actuelle dans le jeu.
+     */
     private int sequenceActual = 1;
+
+    /**
+     * Indice du joueur actuel vérifiant la séquence.
+     */
     private int currentPlayerIndex = 0;
+
+    /**
+     * Liste des séquences aléatoires générées pour le jeu.
+     */
     private List<Integer> randomIntegers = new ArrayList<>();
+
+    /**
+     * Nom d'utilisateur du joueur.
+     */
     private String username;
 
+    /**
+     * Constructeur pour un jeu Simon hors ligne.
+     *
+     * @param controller Référence au contrôleur pour gérer l'interface utilisateur.
+     * @param chrono      Référence à un chronomètre pour suivre le temps.
+     * @param username    Nom d'utilisateur du joueur.
+     */
     public Simon(ControllerSimon controller, Chrono chrono, String username) {
         this.controller = controller;
         chrono.startChrono();
@@ -32,6 +67,16 @@ public class Simon {
         this.username = username;
         this.socket = null;
     }
+
+    /**
+     * Constructeur pour un jeu Simon en mode réseau.
+     *
+     * @param controller Référence au contrôleur pour gérer l'interface utilisateur.
+     * @param socket     Socket pour la communication réseau.
+     * @param chrono     Référence à un chronomètre pour suivre le temps.
+     * @param firstInt   Premier entier de la séquence (généré par le serveur).
+     * @param username   Nom d'utilisateur du joueur.
+     */
     public Simon(ControllerSimon controller, Socket socket, Chrono chrono, int firstInt, String username) {
         this.controller = controller;
         this.socket = socket;
@@ -40,14 +85,18 @@ public class Simon {
         this.username = username;
     }
 
+    /**
+     * Initialise la liste des séquences aléatoires avec 100 entiers compris entre 1 et 4.
+     */
     private void initList() {
         for (int i = 0; i < 100; i++) {
             this.randomIntegers.add(new Random().nextInt(1, 5));
         }
     }
 
-
-    // Méthode pour afficher la séquence actuelle
+    /**
+     * Affiche la séquence actuelle en faisant clignoter les formes dans l'interface.
+     */
     public void displaySequence() {
         this.controller.updateSequence(this.sequenceActual);
         this.controller.disableShape();
@@ -69,9 +118,14 @@ public class Simon {
         sequence.play();
     }
 
-
+    /**
+     * Vérifie si la réponse donnée par le joueur est correcte.
+     *
+     * @param userAnswer La réponse donnée par le joueur (numéro de la forme cliquée).
+     */
     public void checkAnswer(int userAnswer) {
-        if(this.socket == null) {
+        if (this.socket == null) {
+            // Mode hors ligne
             if (this.randomIntegers.get(this.currentPlayerIndex) == userAnswer) {
                 this.currentPlayerIndex++;
 
@@ -87,7 +141,8 @@ public class Simon {
                 this.currentPlayerIndex = 0;
                 javafx.application.Platform.runLater(this::displaySequence);
             }
-        }else{
+        } else {
+            // Mode réseau
             try {
                 BufferedReader bf = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
                 PrintWriter pw = new PrintWriter(this.socket.getOutputStream(), true);
@@ -104,9 +159,9 @@ public class Simon {
 
                 String responseJson;
                 while ((responseJson = bf.readLine()) != null) {
-                    if (!responseJson.isBlank()) { // Vérifie que la ligne n'est pas vide
+                    if (!responseJson.isBlank()) {
                         JsonObject response = gson.fromJson(responseJson, JsonObject.class);
-                        if (response != null) { // Vérifie que le parsing JSON a réussi
+                        if (response != null) {
                             if (response.has("currentPlayerIndex")) {
                                 this.currentPlayerIndex = response.get("currentPlayerIndex").getAsInt();
                             }
@@ -121,7 +176,7 @@ public class Simon {
                                 }
                             }
                             if (response.has("message")) {
-                                if(!response.get("message").getAsString().equals("VALID")) {
+                                if (!response.get("message").getAsString().equals("VALID")) {
                                     this.controller.updateMessageSequence(response.get("message").getAsString());
                                     javafx.application.Platform.runLater(this::displaySequence);
                                 }
@@ -140,15 +195,19 @@ public class Simon {
         }
     }
 
-    // Méthode pour démarrer le jeu
+    /**
+     * Démarre le jeu en réinitialisant la séquence et en affichant la première séquence.
+     */
     public void startGame() {
         sequenceActual = 1;
         currentPlayerIndex = 0;
         javafx.application.Platform.runLater(this::displaySequence);
     }
 
+    /**
+     * Arrête le jeu et notifie le contrôleur.
+     */
     public void stopGame() {
         this.controller.stopSimon();
-        //sendResult(this.username);
     }
 }

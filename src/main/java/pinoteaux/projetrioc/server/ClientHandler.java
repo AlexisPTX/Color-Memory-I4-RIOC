@@ -13,16 +13,61 @@ import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * La classe ClientHandler gère les interactions entre un client et le serveur.
+ * Elle gère la communication via des messages JSON pour la gestion des chat et des réponses dans un jeu de Simon.
+ */
 public class ClientHandler implements Runnable {
-    private final Socket socket;
-    private final int serverNumber;
-    private List<Integer> randomIntegers;
-    private int sequenceActual = 1;
-    private int currentPlayerIndex = 0;
-    private BufferedReader bf;
-    private PrintWriter pw;
-    private CopyOnWriteArrayList<Socket> listClients;
 
+    /**
+     * La socket du client.
+     */
+    private final Socket socket;
+
+    /**
+     * Le numéro du serveur auquel le client est connecté.
+     */
+    private final int serverNumber;
+
+    /**
+     * La liste des entiers aléatoires représentant la séquence de Simon.
+     */
+    private final List<Integer> randomIntegers;
+
+    /**
+     * L'indice de la séquence actuelle.
+     */
+    private int sequenceActual = 1;
+
+    /**
+     * L'indice du joueur actuel dans la séquence.
+     */
+    private int currentPlayerIndex = 0;
+
+    /**
+     * Le BufferedReader pour lire les messages du client.
+     */
+    private BufferedReader bf;
+
+    /**
+     * Le PrintWriter pour envoyer des messages au client.
+     */
+    private PrintWriter pw;
+
+    /**
+     * La liste des sockets des clients connectés au serveur.
+     * Utilisation d'une CopyOnWriteArrayList pour gérer les concurrents.
+     */
+    private final CopyOnWriteArrayList<Socket> listClients;
+
+    /**
+     * Constructeur de la classe ClientHandler avec une séquence de Simon fournie.
+     *
+     * @param socket          La socket du client.
+     * @param serverNumber    Le numéro du serveur auquel le client est connecté.
+     * @param randomIntegers  La liste des entiers aléatoires représentant la séquence de Simon.
+     * @param connectedClients La liste des clients connectés au serveur.
+     */
     public ClientHandler(Socket socket, int serverNumber, List<Integer> randomIntegers, CopyOnWriteArrayList<Socket> connectedClients) {
         this.socket = socket;
         this.serverNumber = serverNumber;
@@ -35,6 +80,14 @@ public class ClientHandler implements Runnable {
         }
         this.listClients = connectedClients;
     }
+
+    /**
+     * Constructeur de la classe ClientHandler sans séquence de Simon fournie.
+     *
+     * @param socket          La socket du client.
+     * @param serverNumber    Le numéro du serveur auquel le client est connecté.
+     * @param connectedClients La liste des clients connectés au serveur.
+     */
     public ClientHandler(Socket socket, int serverNumber, CopyOnWriteArrayList<Socket> connectedClients) {
         this.socket = socket;
         this.serverNumber = serverNumber;
@@ -47,6 +100,11 @@ public class ClientHandler implements Runnable {
         }
         this.listClients = connectedClients;
     }
+
+    /**
+     * La méthode run() permet de lire les messages envoyés par le client et de les traiter en fonction de leur type.
+     * Elle exécute le traitement des messages jusqu'à ce que le client se déconnecte.
+     */
     @Override
     public void run() {
         Gson gson = new Gson();
@@ -56,30 +114,15 @@ public class ClientHandler implements Runnable {
                 try {
                     JsonObject json = gson.fromJson(jsonString, JsonObject.class);
 
-                    if(json.has("type")){
+                    if (json.has("type")) {
                         String type = json.get("type").getAsString();
-                        if(type.equals("CHAT")){
-                            if (json.has("message") && json.has("pseudo")) {
-                                String message = json.get("message").getAsString();
-                                String pseudo = json.get("pseudo").getAsString();
-                                json = new JsonObject();
-                                json.addProperty("type", "CHAT");
-                                json.addProperty("message", message);
-                                json.addProperty("pseudo", pseudo);
-                                for(Socket otherSocket : listClients){
-                                    if (!otherSocket.equals(this.socket)) {
-                                        PrintWriter pw = new PrintWriter(otherSocket.getOutputStream());
-                                        pw.println(gson.toJson(json));
-                                        pw.flush();
-                                    }
-                                }
-                            }
-                        } else if(type.equals("GAME")) {
+                        if (type.equals("CHAT")) {
+                            handleChatMessage(json, gson);
+                        } else if (type.equals("GAME")) {
                             if (json.has("userAnswer")) {
                                 int userAnswer = json.get("userAnswer").getAsInt();
                                 handleUserAnswer(userAnswer);
-                            }
-                             else {
+                            } else {
                                 System.err.println("[ClientHandler] - Invalid message format received.");
                             }
                         }
@@ -93,9 +136,43 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Gère les messages de type "CHAT" envoyés par le client.
+     *
+     * @param json Le message JSON reçu du client.
+     * @param gson L'instance Gson pour sérialiser et désérialiser les objets JSON.
+     * @throws IOException Si une erreur survient lors de l'envoi des messages aux autres clients.
+     */
+    private void handleChatMessage(JsonObject json, Gson gson) throws IOException {
+        if (json.has("message") && json.has("pseudo")) {
+            String message = json.get("message").getAsString();
+            String pseudo = json.get("pseudo").getAsString();
+            json = new JsonObject();
+            json.addProperty("type", "CHAT");
+            json.addProperty("message", message);
+            json.addProperty("pseudo", pseudo);
+
+            for (Socket otherSocket : listClients) {
+                if (!otherSocket.equals(this.socket)) {
+                    PrintWriter pw = new PrintWriter(otherSocket.getOutputStream());
+                    pw.println(gson.toJson(json));
+                    pw.flush();
+                }
+            }
+        }
+    }
+
+    /**
+     * Gère la réponse d'un joueur à une séquence de Simon.
+     * Cette méthode valide la réponse et met à jour l'état du jeu en fonction de la réponse.
+     *
+     * @param userAnswer La réponse de l'utilisateur au tour de Simon.
+     */
     private void handleUserAnswer(int userAnswer) {
         Gson gson = new Gson();
         JsonObject responseJson;
+
+        // Vérification si la réponse est correcte
         if (this.randomIntegers.get(this.currentPlayerIndex) == userAnswer) {
             this.currentPlayerIndex++;
             responseJson = createResponse("VALID");
@@ -108,15 +185,27 @@ public class ClientHandler implements Runnable {
             this.currentPlayerIndex = 0;
             responseJson = createResponse("RESET");
         }
+
+        // Envoi de la réponse au client
         this.pw.println(gson.toJson(responseJson));
         this.pw.flush();
     }
 
+    /**
+     * Crée une réponse au client sous forme d'un objet JSON.
+     * Cette réponse peut contenir des informations comme la séquence actuelle et les indices du joueur.
+     *
+     * @param message Le message à envoyer au client (par exemple, "VALID", "RESET", "SUIVANT").
+     * @return L'objet JSON contenant la réponse à envoyer.
+     */
     private JsonObject createResponse(String message) {
         JsonObject response = new JsonObject();
-        if(!message.equals("VALID")){
+
+        // Si ce n'est pas un message "VALID", on ajoute des informations sur la séquence et l'état actuel
+        if (!message.equals("VALID")) {
             response.addProperty("sequenceActual", this.sequenceActual);
             response.addProperty("currentPlayerIndex", this.currentPlayerIndex);
+
             JsonArray randomIntegersJson = new JsonArray();
             for (int i : this.randomIntegers.subList(0, this.sequenceActual)) {
                 randomIntegersJson.add(i);

@@ -16,6 +16,11 @@ import java.net.Socket;
 
 import static javafx.application.Platform.exit;
 
+/**
+ * La classe Main est l'application principale qui gère l'interface graphique et les interactions avec les utilisateurs.
+ * Elle est responsable du démarrage des différents écrans de l'application, tels que la connexion, le menu principal,
+ * le jeu Simon, et le chat.
+ */
 public class Main extends Application {
 
     private String username;
@@ -24,6 +29,12 @@ public class Main extends Application {
     private Stage actualStage = null;
     private Socket socketServ;
 
+    /**
+     * Méthode principale qui démarre l'application JavaFX.
+     * Elle initialise la scène de connexion et la montre à l'utilisateur.
+     *
+     * @param stage Le stage principal de l'application.
+     */
     @Override
     public void start(Stage stage) {
         actualStage = stage;
@@ -53,7 +64,12 @@ public class Main extends Application {
         actualStage.show();
     }
 
-
+    /**
+     * Démarre l'écran principal de l'application après qu'un nom d'utilisateur ait été saisi.
+     * Affiche le menu principal avec le chat.
+     *
+     * @param username Le nom d'utilisateur choisi par l'utilisateur.
+     */
     public void startMain(String username) {
         this.username = username;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("menu/menu.fxml"));
@@ -77,8 +93,12 @@ public class Main extends Application {
         actualStage.show();
     }
 
-
-    // Méthode pour lancer le jeu Simon
+    /**
+     * Lance le jeu Simon en initialisant les composants nécessaires et en démarrant le jeu.
+     *
+     * @param firstInt Si ce paramètre est 0, un nouveau jeu commence sans serveur; sinon, il représente
+     *                 un identifiant pour un jeu en réseau.
+     */
     public void startSimonGame(int firstInt) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("gamepart/simon.fxml"));
         Parent root = null;
@@ -110,8 +130,10 @@ public class Main extends Application {
         // Démarrez le jeu Simon
         simon.startGame();
     }
-    public void startClassement() {
-    }
+
+    /**
+     * Lance l'écran de sélection du serveur.
+     */
     public void startChoixServer() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("menu/choixServer.fxml"));
         Parent root = null;
@@ -133,6 +155,11 @@ public class Main extends Application {
         actualStage.show();
     }
 
+    /**
+     * Gère la réception d'un nouveau socket pour un serveur, et met à jour l'interface en fonction de l'état actuel du tournoi.
+     *
+     * @param socketServ Le socket du serveur auquel se connecter.
+     */
     public void attenteDebutTournoi(Socket socketServ) {
         try {
             this.socketServ.close();
@@ -169,7 +196,14 @@ public class Main extends Application {
         actualStage.show();
     }
 
-
+    /**
+     * Crée un layout avec un chat intégré à un contenu principal donné.
+     *
+     * @param mainContent Le contenu principal de la scène (par exemple, le menu ou le jeu).
+     * @param affichage   Si "GLOBAL", initialiser le chat avec un socket de serveur global.
+     *                    Si "SERVER", utiliser un socket serveur déjà établi.
+     * @return Un `Parent` contenant le chat et le contenu principal.
+     */
     private Parent createChatLayout(Parent mainContent, String affichage) {
         FXMLLoader chatLoader = new FXMLLoader(getClass().getResource("menu/chat.fxml"));
         if(affichage.equals("GLOBAL")) {
@@ -207,7 +241,12 @@ public class Main extends Application {
         return layout;
     }
 
-
+    /**
+     * Initialise et démarre un ChatHandler dans un thread séparé.
+     *
+     * @param socket        Le socket pour la connexion de chat.
+     * @param controllerChat Le contrôleur de chat pour gérer les interactions avec l'utilisateur.
+     */
     private void startChatHandler(Socket socket, ControllerChat controllerChat) {
         this.chatHandler = new ChatHandler(socket);
         this.chatHandler.setControllerChat(controllerChat);
@@ -216,13 +255,20 @@ public class Main extends Application {
         new Thread(this.chatHandler).start();
     }
 
+    /**
+     * Récupère le stage actuel de l'application.
+     *
+     * @return Le stage actuel de l'application.
+     */
     public Stage getStage(){
         return this.actualStage;
     }
 
-
-
-
+    /**
+     * Méthode principale pour démarrer l'application JavaFX.
+     *
+     * @param args Les arguments de ligne de commande (non utilisés ici).
+     */
     public static void main(String[] args) {
         launch();
     }

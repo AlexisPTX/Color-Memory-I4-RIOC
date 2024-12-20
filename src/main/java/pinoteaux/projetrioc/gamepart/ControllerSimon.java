@@ -10,54 +10,132 @@ import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
+/**
+ * Classe contrôleur pour le jeu Simon.
+ * Gère l'interaction utilisateur, l'affichage des séquences, le chronomètre et les actions liées aux boutons de couleur.
+ */
 public class ControllerSimon {
 
+    /**
+     * Chemin SVG pour la section rouge.
+     */
     @FXML
     private SVGPath red;
+
+    /**
+     * Chemin SVG pour la section bleue.
+     */
     @FXML
     private SVGPath blue;
+
+    /**
+     * Chemin SVG pour la section jaune.
+     */
     @FXML
     private SVGPath yellow;
+
+    /**
+     * Chemin SVG pour la section verte.
+     */
     @FXML
     private SVGPath green;
+
+    /**
+     * Texte affichant le temps restant.
+     */
     @FXML
     private Text temps;
+
+    /**
+     * Texte affichant la séquence actuelle.
+     */
     @FXML
     private Text sequence;
+
+    /**
+     * Texte affichant les messages de progression ou d'erreur.
+     */
     @FXML
     private Text messageSequence;
+
+    /**
+     * Groupe de fin de jeu (affiché à la fin d'une partie).
+     */
     @FXML
     private Group finGroup;
+
+    /**
+     * Groupe de jeu principal.
+     */
     @FXML
     private Group jeuGroup;
+
+    /**
+     * Instance du jeu Simon associée à ce contrôleur.
+     */
     private Simon simon;
 
+    /**
+     * Définit l'instance du jeu Simon pour ce contrôleur.
+     *
+     * @param simon Instance de {@link Simon}.
+     */
     public void setSimon(Simon simon) {
         this.simon = simon;
         this.finGroup.setVisible(false);
     }
 
-    public void stopSimon(){
+    /**
+     * Arrête le jeu Simon, rend l'interface non interactive et affiche l'écran de fin.
+     */
+    public void stopSimon() {
         this.jeuGroup.setMouseTransparent(true);
         this.finGroup.setVisible(true);
     }
 
+    /**
+     * Action déclenchée lorsque la section rouge est cliquée.
+     *
+     * @param e Événement de la souris.
+     */
     public void actionRed(MouseEvent e) {
         handleAction(e, 4);
     }
 
+    /**
+     * Action déclenchée lorsque la section jaune est cliquée.
+     *
+     * @param e Événement de la souris.
+     */
     public void actionYellow(MouseEvent e) {
         handleAction(e, 3);
     }
 
+    /**
+     * Action déclenchée lorsque la section bleue est cliquée.
+     *
+     * @param e Événement de la souris.
+     */
     public void actionBlue(MouseEvent e) {
         handleAction(e, 2);
     }
 
+    /**
+     * Action déclenchée lorsque la section verte est cliquée.
+     *
+     * @param e Événement de la souris.
+     */
     public void actionGreen(MouseEvent e) {
         handleAction(e, 1);
     }
 
+    /**
+     * Gère une action utilisateur pour une couleur spécifique.
+     * Désactive les sections, fait clignoter la couleur et vérifie la réponse.
+     *
+     * @param e          Événement de la souris.
+     * @param colorIndex Index de la couleur (1 = vert, 2 = bleu, 3 = jaune, 4 = rouge).
+     */
     public void handleAction(MouseEvent e, int colorIndex) {
         disableShape();
         Timeline timeline = new Timeline();
@@ -67,27 +145,31 @@ public class ControllerSimon {
         KeyFrame darkFrame = new KeyFrame(Duration.seconds(0.5), event -> {
             this.blinkShape(colorIndex, "DARK");
         });
-        KeyFrame delayFrame = new KeyFrame(Duration.seconds(0.3)); // Délai de 0.5 seconde
+        KeyFrame delayFrame = new KeyFrame(Duration.seconds(0.3));
 
         timeline.getKeyFrames().addAll(brightFrame, darkFrame, delayFrame);
         timeline.setOnFinished(event -> {
-            this.simon.checkAnswer(colorIndex); // Appeler checkAnswer après la fin de la timeline
+            this.simon.checkAnswer(colorIndex);
             enableShape();
         });
         timeline.play();
-
-
     }
 
+    /**
+     * Fait clignoter une forme SVG dans une couleur spécifique (BRIGHT ou DARK).
+     *
+     * @param i Index de la couleur (1 = vert, 2 = bleu, 3 = jaune, 4 = rouge).
+     * @param s État de la couleur ("BRIGHT" ou "DARK").
+     */
     public void blinkShape(int i, String s) {
-        if(s.equals("DARK")) {
+        if (s.equals("DARK")) {
             switch (i) {
                 case 1 -> this.green.setFill(Color.GREEN);
                 case 2 -> this.blue.setFill(Color.MIDNIGHTBLUE);
                 case 3 -> this.yellow.setFill(Color.DARKGOLDENROD);
                 case 4 -> this.red.setFill(Color.DARKRED);
             }
-        } else if(s.equals("BRIGHT")) {
+        } else if (s.equals("BRIGHT")) {
             switch (i) {
                 case 1 -> this.green.setFill(Color.LIME);
                 case 2 -> this.blue.setFill(Color.BLUE);
@@ -97,6 +179,9 @@ public class ControllerSimon {
         }
     }
 
+    /**
+     * Désactive les sections de couleur pour empêcher toute interaction.
+     */
     public void disableShape() {
         this.red.setDisable(true);
         this.blue.setDisable(true);
@@ -104,6 +189,9 @@ public class ControllerSimon {
         this.yellow.setDisable(true);
     }
 
+    /**
+     * Réactive les sections de couleur pour permettre l'interaction.
+     */
     public void enableShape() {
         this.red.setDisable(false);
         this.blue.setDisable(false);
@@ -111,14 +199,30 @@ public class ControllerSimon {
         this.yellow.setDisable(false);
     }
 
+    /**
+     * Met à jour l'affichage du temps restant.
+     *
+     * @param temps Temps restant au format texte.
+     */
     public void updateTemps(String temps) {
         this.temps.setText(temps);
     }
 
+    /**
+     * Met à jour l'affichage de la séquence actuelle.
+     *
+     * @param sequence Séquence actuelle.
+     */
     public void updateSequence(int sequence) {
         this.sequence.setText(String.valueOf(sequence));
     }
 
+    /**
+     * Met à jour le message de progression ou d'erreur.
+     * Affiche un message temporaire selon le type (suivant ou réinitialisation).
+     *
+     * @param message Message à afficher ("SUIVANT" ou "RESET").
+     */
     public void updateMessageSequence(String message) {
         Timeline timeline = new Timeline();
         KeyFrame writeFrame = null;
@@ -131,7 +235,6 @@ public class ControllerSimon {
             emptyFrame = new KeyFrame(Duration.seconds(1), event -> {
                 this.messageSequence.setText("");
             });
-
         } else if (message.equals("RESET")) {
             writeFrame = new KeyFrame(Duration.seconds(0), event -> {
                 this.messageSequence.setFill(Color.RED);
